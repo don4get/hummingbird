@@ -1,4 +1,6 @@
 import numpy as np
+
+
 class PlotboxArgs:
     ''' Class for storing and validating StatePlotbox arguments
 
@@ -25,6 +27,7 @@ class PlotboxArgs:
         -rad2deg (bool): If True, the data will be converted from radians to degrees.
             Note: If rad2deg is True, is_angle will be forced to True.
     '''
+
     def __init__(self, title=None, plots=None, sigma_bounds=None, legend=True,
                  time_window=15.0, max_length=None,
                  axis_color='w', axis_width=1, labels=None, plot_hues=4,
@@ -39,7 +42,9 @@ class PlotboxArgs:
             elif isinstance(plots[0], str):
                 self.title = plots[0]
             else:
-                raise TypeError('plots input {} of incorrect type ({}). Expected PlotArgs or str object'.format(plots[0], type(plots[0])))
+                raise TypeError(
+                    'plots input {} of incorrect type ({}). Expected PlotArgs or str object'.format(plots[0],
+                                                                                                    type(plots[0])))
 
         else:
             raise ValueError('Must provide a plotbox title or plot names.')
@@ -48,7 +53,7 @@ class PlotboxArgs:
         self.plots = []
         if plots is not None:
             if not isinstance(plots, (list, tuple, np.ndarray)):
-                plots = [plots] # convert to a list
+                plots = [plots]  # convert to a list
             for p in plots:
                 if isinstance(p, PlotArgs):
                     if p.sigma_bounds is None:
@@ -61,24 +66,28 @@ class PlotboxArgs:
                         p.is_angle = is_angle or rad2deg or p.rad2deg
                     self.plots.append(p)
                 elif isinstance(p, str):
-                    self.plots.append(PlotArgs(p, sigma_bounds=sigma_bounds, max_length=max_length, is_angle=is_angle, rad2deg=rad2deg))
+                    self.plots.append(PlotArgs(p, sigma_bounds=sigma_bounds, max_length=max_length, is_angle=is_angle,
+                                               rad2deg=rad2deg))
                 else:
-                    raise TypeError('plots input {} of incorrect type ({}). Expected PlotArgs or str object'.format(p, type(p)))
+                    raise TypeError(
+                        'plots input {} of incorrect type ({}). Expected PlotArgs or str object'.format(p, type(p)))
         else:
             # If no plots are defined, assume the title and plot are the same
-            self.plots.append(PlotArgs(self.title, sigma_bounds=sigma_bounds, max_length=max_length, is_angle=is_angle, rad2deg=rad2deg))
+            self.plots.append(PlotArgs(self.title, sigma_bounds=sigma_bounds, max_length=max_length, is_angle=is_angle,
+                                       rad2deg=rad2deg))
 
         # Save other params
-        self.legend         = legend
-        self.time_window    = time_window
-        self.axis_color     = axis_color
-        self.axis_width     = axis_width
-        self.labels         = labels
-        self.plot_hues      = max(plot_hues, len(self.plots))
-        self.plot_min_hue   = plot_min_hue
-        self.plot_max_hue   = plot_max_hue
+        self.legend = legend
+        self.time_window = time_window
+        self.axis_color = axis_color
+        self.axis_width = axis_width
+        self.labels = labels
+        self.plot_hues = max(plot_hues, len(self.plots))
+        self.plot_min_hue = plot_min_hue
+        self.plot_max_hue = plot_max_hue
         self.plot_min_value = plot_min_value
         self.plot_max_value = plot_max_value
+
 
 class PlotArgs:
     ''' Class for storing and validating StatePlot arguments
@@ -108,10 +117,11 @@ class PlotArgs:
             This is useful for debugging or only viewing one of multiple plots in a plotbox
             with minimal changes to the initialization code
     '''
+
     def __init__(self, name=None, states=None, sigma_bounds=None,
-                    is_angle=None, rad2deg=None, max_length=None,
-                    connect=True, symbol='o', symbol_size=2, px_mode=True,
-                    color=None, hidden=False):
+                 is_angle=None, rad2deg=None, max_length=None,
+                 connect=True, symbol='o', symbol_size=2, px_mode=True,
+                 color=None, hidden=False):
         # Define name
         if name is not None:
             self.name = name
@@ -133,7 +143,7 @@ class PlotArgs:
         self.is_angle = is_angle or rad2deg
         self.rad2deg = rad2deg
         self.max_length = max_length
-        self.connect =  connect
+        self.connect = connect
         self.symbol = symbol
         self.symbol_size = symbol_size
         self.px_mode = px_mode

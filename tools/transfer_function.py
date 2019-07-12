@@ -4,16 +4,17 @@ transfer function block (SISO)
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 class transfer_function:
     def __init__(self, num, den, Ts):
         # expects num and den to be numpy arrays of shape (1,m) and (1,n)
         if len(num.shape) == 1:
-            num = num.reshape(1,num.size)
-            den = den.reshape(1,den.size)
+            num = num.reshape(1, num.size)
+            den = den.reshape(1, den.size)
         m = num.shape[1]
         n = den.shape[1]
         # set initial conditions
-        self._state = np.zeros((n-1, 1))
+        self._state = np.zeros((n - 1, 1))
         # make the leading coef of den == 1
         if den[0][0] != 1:
             den = den / den[0][0]
@@ -21,32 +22,33 @@ class transfer_function:
         self.num = num
         self.den = den
         # set up state space equations in control canonical form
-        self._A = np.eye(n-1)
-        self._B = np.zeros((n-1, 1))
-        self._C = np.zeros((1, n-1))
+        self._A = np.eye(n - 1)
+        self._B = np.zeros((n - 1, 1))
+        self._C = np.zeros((1, n - 1))
         self._B[0][0] = Ts
         if m == n:
             self._D = num[0][0]
             for i in range(0, m):
-                self._C[0][n-i-2] = num[0][m-i-1] - num[0][0]*den[0][n-i-2]
-            for i in range(0, n-1):
-                self._A[0][i] += - Ts * den[0][i+1]
-            for i in range(1, n-1):
-                self._A[i][i-1] += Ts
+                self._C[0][n - i - 2] = num[0][m - i - 1] - num[0][0] * den[0][n - i - 2]
+            for i in range(0, n - 1):
+                self._A[0][i] += - Ts * den[0][i + 1]
+            for i in range(1, n - 1):
+                self._A[i][i - 1] += Ts
         else:
             self._D = 0.0
             for i in range(0, m):
-                self._C[0][n-i-2] = num[0][m-i-1]
-            for i in range(0, n-1):
+                self._C[0][n - i - 2] = num[0][m - i - 1]
+            for i in range(0, n - 1):
                 self._A[0][i] += - Ts * den[0][i]
-            for i in range(1, n-1):
-                self._A[i][i-1] += Ts
+            for i in range(1, n - 1):
+                self._A[i][i - 1] += Ts
 
     def update(self, u):
         '''Update state space model'''
         self._state = self._A @ self._state + self._B * u
         y = self._C @ self._state + self._D * u
         return y[0][0]
+
 
 if __name__ == "__main__":
     # instantiate the system
@@ -62,7 +64,7 @@ if __name__ == "__main__":
     while sim_time < 10.0:
         u = np.random.randn()  # white noise
         y = system.update(u)  # update based on current input
-        sim_time += Ts   # increment the simulation time
+        sim_time += Ts  # increment the simulation time
 
         # update date for plotting
         time.append(sim_time)
@@ -71,5 +73,3 @@ if __name__ == "__main__":
     # plot output vs time
     plt.plot(time, output)
     plt.show()
-
-

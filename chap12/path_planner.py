@@ -6,9 +6,11 @@
 #         4/3/2019 - BGM
 import numpy as np
 import sys
+
 sys.path.append('..')
 from message_types.msg_waypoints import msg_waypoints
-from chap12.planRRT import planRRT
+from .planRRT import planRRT
+
 
 class path_planner:
     def __init__(self):
@@ -45,9 +47,9 @@ class path_planner:
                 = np.array([Va, Va, Va, Va])
             self.waypoints.course[:self.waypoints.num_waypoints] \
                 = np.array([np.radians(0),
-                             np.radians(45),
-                             np.radians(45),
-                             np.radians(-135)])
+                            np.radians(45),
+                            np.radians(45),
+                            np.radians(-135)])
         elif planner_flag == 3:
             self.waypoints.type = 'fillet'
             wp_start = np.array([state.pn, state.pe, -state.h])

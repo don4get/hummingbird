@@ -9,6 +9,7 @@ part of mavsim_python
 """
 import numpy as np
 
+
 class msg_path:
     def __init__(self):
         # type='line' means straight line following, type='orbit' means orbit following

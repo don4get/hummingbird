@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append('..')
 import numpy as np
 import parameters.aerosonde_parameters as MAV
@@ -15,10 +16,10 @@ Va0 = MAV.u0
 phi_max = np.radians(37)
 
 # minimum turn radius
-R_min = Va0**2 / MAV.gravity / np.tan(phi_max)
+R_min = Va0 ** 2 / MAV.gravity / np.tan(phi_max)
 
 # create random city map
-city_width      = 2000  # the city is of size (width)x(width)
-building_height = 300   # maximum height of buildings
-num_blocks      = 5     # number of blocks in city
-street_width    = 0.8   # percent of block that is street.
+city_width = 2000  # the city is of size (width)x(width)
+building_height = 300  # maximum height of buildings
+num_blocks = 5  # number of blocks in city
+street_width = 0.8  # percent of block that is street.

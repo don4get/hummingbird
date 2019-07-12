@@ -5,6 +5,7 @@ from state_plotter.plotter_args import PlotboxArgs
 from state_plotter.state_plot import StatePlot
 from pdb import set_trace
 
+
 class StatePlotbox():
     def __init__(self, window, args):
         ''' Create a new plotbox wrapper object
@@ -22,7 +23,7 @@ class StatePlotbox():
         if args.labels is not None:
             self.plotbox = window.addPlot(title=args.title, labels=args.labels)
         else:
-            self.plotbox = window.addPlot(labels={'left':args.title})
+            self.plotbox = window.addPlot(labels={'left': args.title})
 
         # Handle dimension parameters
         self.dimension = len(args.plots[0].state_names)
@@ -30,8 +31,7 @@ class StatePlotbox():
             self.plotbox.setAutoVisible(y=True)
         else:
             self.plotbox.setAutoVisible(x=True, y=True)
-            self.plotbox.setAspectLocked() # Lock x/y ratio to be 1
-
+            self.plotbox.setAspectLocked()  # Lock x/y ratio to be 1
 
         # Handle color parameters
         self.set_axis_color(args.axis_color, args.axis_width)
@@ -64,7 +64,7 @@ class StatePlotbox():
         self.plotbox.getAxis("bottom").setPen(self.axis_pen)
 
     def add_legend(self):
-        self.plotbox.addLegend(size=(1,1), offset=(1,1))
+        self.plotbox.addLegend(size=(1, 1), offset=(1, 1))
 
     def add_plot(self, plot_args):
         if plot_args.color is None:
@@ -102,8 +102,7 @@ class StatePlotbox():
             self.plotbox.enableAutoRange(axis=ViewBox.XYAxes)
             # TODO: Add 3D support here
 
-
     def _get_color(self, index):
         ''' Returns incremental plot colors based on index '''
         return pg.intColor(index, minValue=self.plot_min_value, maxValue=self.plot_max_value,
-                            hues=self.distinct_plot_hues, minHue=self.plot_min_hue, maxHue=self.plot_max_hue)
+                           hues=self.distinct_plot_hues, minHue=self.plot_min_hue, maxHue=self.plot_max_hue)

@@ -10,6 +10,7 @@ part of mavsim_python
 import numpy as np
 import parameters.planner_parameters as PLAN
 
+
 class msg_waypoints:
     def __init__(self):
         # the first two flags are used for interacting with the path planner
@@ -50,5 +51,4 @@ class msg_waypoints:
         self.course = wp_courses
         self.flag_waypoints_changed = True
         self.num_waypoints = self.ned.shape[0]
-        self.airspeed = np.array([PLAN.Va0]*self.num_waypoints)
-        
+        self.airspeed = np.array([PLAN.Va0] * self.num_waypoints)

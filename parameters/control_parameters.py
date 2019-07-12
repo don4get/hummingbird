@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append('..')
 import numpy as np
 import pickle as pkl
@@ -12,11 +13,11 @@ Va0 = 25
 
 # data = []
 # with open("trim.pkl", 'rb') as f:
-    # data = pkl.load(f)
+# data = pkl.load(f)
 
 # deltas_trim = data[1]
 
-#----------roll loop-------------
+# ----------roll loop-------------
 roll_kp = 0.4743
 roll_kd = 0.1584
 
