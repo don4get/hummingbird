@@ -8,14 +8,14 @@ import numpy as np
 import sys
 
 sys.path.append('..')
-from hummingbird.message_types.msg_waypoints import msg_waypoints
-from hummingbird.guidance.planRRT import planRRT
+from hummingbird.message_types.msg_waypoints import MsgWaypoints
+from hummingbird.guidance.plan_rrt import planRRT
 
 
 class path_planner:
     def __init__(self):
         # waypoints definition
-        self.waypoints = msg_waypoints()
+        self.waypoints = MsgWaypoints()
         self.rrt = planRRT()
 
     def update(self, map, state):

@@ -2,7 +2,7 @@
 import numpy as np
 
 
-class StateData():
+class StateData:
     def __init__(self, sigma_bounds=None, max_length=None, is_angle=False, rad2deg=False):
         self.data = []
         self.time = []

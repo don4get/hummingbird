@@ -10,7 +10,7 @@ import numpy as np
 sys.path.append('..')
 
 
-class control_base:
+class ControlBase:
     def __init__(self):
         pass
 
@@ -36,7 +36,7 @@ class control_base:
         self.error_delay_1 = e
 
 
-class pid_control(control_base):
+class PidControl(ControlBase):
     def __init__(self, kp=0.0, ki=0.0, kd=0.0, Ts=0.01, sigma=0.05, limit=1.0, lower_lim=None):
         self.kp = kp
         self.ki = ki
@@ -85,7 +85,7 @@ class pid_control(control_base):
         return u_sat
 
 
-class pi_control(control_base):
+class PiControl(ControlBase):
     def __init__(self, kp=0.0, ki=0.0, Ts=0.01, limit=1.0, lower_lim=None):
         self.kp = kp
         self.ki = ki
@@ -114,7 +114,7 @@ class pi_control(control_base):
         return u_sat
 
 
-class pd_control_with_rate(control_base):
+class PdControlWithRate(ControlBase):
     # PD control with rate information
     # u = kp*(yref-y) - kd*ydot
     def __init__(self, kp=0.0, kd=0.0, limit=1.0, lower_lim=None):

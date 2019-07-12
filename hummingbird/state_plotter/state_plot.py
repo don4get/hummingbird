@@ -6,7 +6,7 @@ from hummingbird.state_plotter.state_data import StateData
 import numpy as np
 
 
-class StatePlot():
+class StatePlot:
     def __init__(self, plotbox, args):
         if not isinstance(args, PlotArgs):
             raise TypeError('\'args\' argument must be of type PlotArgs')

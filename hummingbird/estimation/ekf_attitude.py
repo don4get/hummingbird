@@ -7,7 +7,7 @@ import hummingbird.parameters.sensor_parameters as SENSOR
 from hummingbird.tools.rotations import jacobian
 
 
-class ekf_attitude:
+class EkfAttitude:
     # implement continous-discrete EKF to estimate roll and pitch angles
     def __init__(self):
         self.Q = np.diag([1e-6, 1e-6])

@@ -1,6 +1,10 @@
-numpy
-pyqtgraph
-PyQt5
-matplotlib
 IPython
+matplotlib
+numpy
+opencv-python
+Pillow
 PyOpenGl
+PyQt5
+pyqtgraph
+pyscreenshot
+scipy

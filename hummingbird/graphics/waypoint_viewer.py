@@ -12,11 +12,11 @@ import numpy as np
 import pyqtgraph as pg
 import pyqtgraph.opengl as gl
 
-from hummingbird.tools import Euler2Rotation
-from hummingbird.guidance import dubins_parameters
+from hummingbird.tools.rotations import Euler2Rotation
+from hummingbird.guidance import dubin_parameters
 
 
-class waypoint_viewer():
+class WaypointViewer:
     def __init__(self):
         self.scale = 4000
         # initialize Qt gui application and window
@@ -36,7 +36,7 @@ class waypoint_viewer():
         # get points that define the non-rotated, non-translated mav and the mesh colors
         self.mav_points, self.mav_meshColors = self.get_mav_points()
         # dubins path parameters
-        self.dubins_path = dubins_parameters()
+        self.dubins_path = dubin_parameters()
         self.mav_body = []
 
     ###################################

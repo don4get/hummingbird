@@ -33,9 +33,9 @@ obsv = observer(SIM.ts_simulation)
 measurements = mav.sensors
 
 # autopilot commands
-from hummingbird.message_types.msg_autopilot import msg_autopilot
+from hummingbird.message_types.msg_autopilot import MsgAutopilot
 
-commands = msg_autopilot()
+commands = MsgAutopilot()
 Va_command = signals(dc_offset=25.0,
                      amplitude=3.0,
                      start_time=2.0,

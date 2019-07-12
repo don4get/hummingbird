@@ -2,14 +2,14 @@ import numpy as np
 import sys
 
 sys.path.append('..')
-from hummingbird.guidance.dubins_parameters import dubins_parameters
-from hummingbird.message_types.msg_path import msg_path
+from hummingbird.guidance.dubin_parameters import DubinParameters
+from hummingbird.message_types.msg_path import MsgPath
 
 
 class path_manager:
     def __init__(self):
         # message sent to path follower
-        self.path = msg_path()
+        self.path = MsgPath()
         # pointers to previous, current, and next waypoints
         self.ptr_prev = 0
         self.ptr_current = 1
@@ -23,7 +23,7 @@ class path_manager:
         # state of the manager state machine
         self.manager_state = 1
         # dubins path parameters
-        self.dubins_path = dubins_parameters()
+        self.dubins_path = DubinParameters()
         self.state_changed = True
 
     def update(self, waypoints, radius, state):

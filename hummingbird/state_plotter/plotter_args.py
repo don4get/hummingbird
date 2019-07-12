@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class PlotboxArgs:
+class PlotBoxArgs:
     ''' Class for storing and validating StatePlotbox arguments
 
     Arguments:

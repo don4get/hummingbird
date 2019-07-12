@@ -4,19 +4,14 @@ mavsim_python: world viewer (for chapter 12)
     - Update history:
         4/3/2019 - BGM
 """
-import sys
-
-sys.path.append("..")
 import numpy as np
-
 import pyqtgraph as pg
 import pyqtgraph.opengl as gl
-
 from hummingbird.tools.rotations import Euler2Rotation
-from hummingbird.guidance.dubins_parameters import dubins_parameters
+from hummingbird.guidance.dubin_parameters import DubinParameters
 
 
-class world_viewer():
+class WorldViewer:
     def __init__(self):
         self.scale = 4000
         # initialize Qt gui application and window
@@ -36,7 +31,7 @@ class world_viewer():
         # get points that define the non-rotated, non-translated mav and the mesh colors
         self.mav_points, self.mav_meshColors = self.get_mav_points()
         # dubins path parameters
-        self.dubins_path = dubins_parameters()
+        self.dubins_path = DubinParameters()
         self.mav_body = []
 
     ###################################

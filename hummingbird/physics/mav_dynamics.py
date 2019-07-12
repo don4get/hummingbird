@@ -14,8 +14,8 @@ sys.path.append('..')
 import numpy as np
 
 # load message types
-from hummingbird.message_types.msg_state import msg_state
-from hummingbird.message_types.msg_sensors import msg_sensors
+from hummingbird.message_types.msg_state import MsgState
+from hummingbird.message_types.msg_sensors import MsgSensors
 
 from hummingbird.parameters import aerosonde_parameters as MAV
 import hummingbird.parameters.sensor_parameters as SENSOR
@@ -25,7 +25,7 @@ from math import asin, exp, acos
 np.set_printoptions(suppress=True, precision=4)
 
 
-class mav_dynamics:
+class MavDynamics:
     def __init__(self, Ts):
         self._ts_simulation = Ts
         self._state = np.array([MAV.pn0,  # (0)
@@ -52,8 +52,8 @@ class mav_dynamics:
         self._Va = MAV.u0
         self._alpha = 0
         self._beta = 0
-        self.true_state = msg_state()
-        self.sensors = msg_sensors()
+        self.true_state = MsgState()
+        self.sensors = MsgSensors()
         self._update_true_state()
 
         # random walk parameters for GPS

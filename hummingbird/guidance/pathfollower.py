@@ -1,20 +1,17 @@
 import numpy as np
 from math import sin, cos, atan, atan2
-import sys
-
-sys.path.append('..')
-from hummingbird.message_types.msg_autopilot import msg_autopilot
-from hummingbird.message_types.msg_path import msg_path
-from hummingbird.message_types.msg_state import msg_state
+from hummingbird.message_types.msg_autopilot import MsgAutopilot
+from hummingbird.message_types.msg_path import MsgPath
+from hummingbird.message_types.msg_state import MsgState
 
 
-class path_follower:
+class PathFollower:
     def __init__(self):
         self.chi_inf = np.radians(80)  # approach angle for large distance from straight-line path
         self.k_path = 0.02  # proportional gain for straight-line path following
         self.k_orbit = 2.5  # proportional gain for orbit following
         self.gravity = 9.8
-        self.autopilot_commands = msg_autopilot()  # message sent to autopilot
+        self.autopilot_commands = MsgAutopilot()  # message sent to autopilot
 
     def update(self, path, state):
         if path.type == 'line':
@@ -23,7 +20,7 @@ class path_follower:
             self._follow_orbit(path, state)
         return self.autopilot_commands
 
-    def _follow_straight_line(self, path=msg_path(), state=msg_state()):
+    def _follow_straight_line(self, path=MsgPath(), state=MsgState()):
         q = np.copy(path.line_direction)
         chi_q = atan2(q[1], q[0])
         chi_q = self._wrap(chi_q, state.chi)
@@ -54,7 +51,7 @@ class path_follower:
         self.autopilot_commands.altitude_command = hc
         self.autopilot_commands.phi_feedforward = 0
 
-    def _follow_orbit(self, path=msg_path(), state=msg_state()):
+    def _follow_orbit(self, path=MsgPath(), state=MsgState()):
         p = np.array([state.pn, state.pe, -state.h])  # NED position
         d = p - path.orbit_center  # radial distance from orbit center
         rho = path.orbit_radius

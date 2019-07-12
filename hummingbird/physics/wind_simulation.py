@@ -10,7 +10,7 @@ import numpy as np
 from hummingbird.parameters import aerosonde_parameters as MAV
 
 
-class wind_simulation:
+class WindSimulation:
     def __init__(self, Ts):
         # steady state wind defined in the inertial frame
         # self._steady_state = np.array([0., 0., 0.])

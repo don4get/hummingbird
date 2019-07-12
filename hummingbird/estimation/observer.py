@@ -10,15 +10,15 @@ import numpy as np
 sys.path.append('..')
 from hummingbird.parameters import aerosonde_parameters as MAV
 
-from hummingbird.message_types.msg_state import msg_state
-from hummingbird.estimation.ekf_attitude import ekf_attitude
+from hummingbird.message_types.msg_state import MsgState
+from hummingbird.estimation.ekf_attitude import EkfAttitude
 from hummingbird.estimation.ekf_position import ekf_position
 
 
-class observer:
+class Observer:
     def __init__(self, ts_control):
         # initialized estimated state message
-        self.estimated_state = msg_state()
+        self.estimated_state = MsgState()
         # use alpha filters to low pass filter gyros and accels
         self.lpf_gyro_x = alpha_filter(alpha=0.5)
         self.lpf_gyro_y = alpha_filter(alpha=0.5)
@@ -30,7 +30,7 @@ class observer:
         self.lpf_static = alpha_filter(alpha=0.9, y0=1350)
         self.lpf_diff = alpha_filter(alpha=0.5)
         # ekf for phi and theta
-        self.attitude_ekf = ekf_attitude()
+        self.attitude_ekf = EkfAttitude()
         # ekf for pn, pe, Vg, chi, wn, we, psi
         self.position_ekf = ekf_position()
 

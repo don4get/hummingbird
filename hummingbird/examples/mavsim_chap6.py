@@ -16,7 +16,7 @@ from chap4.mav_dynamics import mav_dynamics
 from chap4.wind_simulation import wind_simulation
 from chap6.autopilot import autopilot
 from hummingbird.tools import signals
-from hummingbird.message_types.msg_autopilot import msg_autopilot
+from hummingbird.message_types.msg_autopilot import MsgAutopilot
 
 # initialize the visualization
 mav_view = mav_viewer()  # initialize the mav viewer
@@ -31,7 +31,7 @@ mav = mav_dynamics(SIM.ts_simulation)
 ctrl = autopilot(SIM.ts_simulation)
 
 # autopilot commands
-commands = msg_autopilot()
+commands = MsgAutopilot()
 Va_command = signals(dc_offset=25.0,
                      amplitude=3.0,
                      start_time=2.0,

@@ -12,10 +12,10 @@ import numpy as np
 import pyqtgraph as pg
 import pyqtgraph.opengl as gl
 
-from hummingbird.tools import Euler2Rotation
+from hummingbird.tools.rotations import Euler2Rotation
 
 
-class path_viewer():
+class PathViewer:
     def __init__(self):
         self.scale = 4000
         # initialize Qt gui application and window

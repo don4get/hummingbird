@@ -9,7 +9,7 @@ import cv2
 import pyscreenshot as ImageGrab
 
 
-class video_writer():
+class VideoWriter:
     def __init__(self, video_name="video.avi", bounding_box=(0, 0, 1000, 1000), output_rate=0.1):
         # bbox specifies specific region (bbox= top_left_x, top_left_y, width, height)
         # set up video writer by grabbing first image and initializing

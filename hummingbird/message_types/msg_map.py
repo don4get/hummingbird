@@ -8,7 +8,7 @@
 import numpy as np
 
 
-class msg_map:
+class MsgMap:
     def __init__(self, PLAN):
         # flag to indicate if the map has changed
         self.flag_map_changed = 0

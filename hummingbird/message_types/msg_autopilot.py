@@ -9,7 +9,7 @@ part of mavsim_python
 """
 
 
-class msg_autopilot:
+class MsgAutopilot:
     def __init__(self):
         self.airspeed_command = 0.0  # commanded airspeed m/s
         self.course_command = 0.0  # commanded course angle in rad

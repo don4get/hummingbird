@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 import pyqtgraph as pg
 from pyqtgraph import ViewBox
-from hummingbird.state_plotter.plotter_args import PlotboxArgs
+from hummingbird.state_plotter.plotter_args import PlotBoxArgs
 from hummingbird.state_plotter.state_plot import StatePlot
 
 
-class StatePlotbox():
+class StatePlotBox:
     def __init__(self, window, args):
         ''' Create a new plotbox wrapper object
 
@@ -16,7 +16,7 @@ class StatePlotbox():
                 appropriate arguments for the plotbox
 
         '''
-        if not isinstance(args, PlotboxArgs):
+        if not isinstance(args, PlotBoxArgs):
             raise TypeError('\'args\' argument must be of type PlotboxArgs')
         # Initlialize plotbox
         if args.labels is not None:

@@ -5,7 +5,7 @@ from PyQt5 import QtCore
 from pyqtgraph import GraphicsWindow
 
 
-class MoveableWindow(GraphicsWindow):
+class MovableWindow(GraphicsWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

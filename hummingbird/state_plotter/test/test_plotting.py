@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from builtins import input
 
-from hummingbird.state_plotter.Plotter import Plotter
+from hummingbird.state_plotter.plotter import Plotter
 from hummingbird.state_plotter.plotter_args import *
 
 plotter = Plotter(plotting_frequency=1)
@@ -13,16 +13,16 @@ first_row = ['x', 'y', 'z']
 
 ## Multiple plots in a plotbox (using PlotboxArgs)
 # -Simply add multiple plot names
-phi_plots = PlotboxArgs(plots=['phi', 'phi_e'])
+phi_plots = PlotBoxArgs(plots=['phi', 'phi_e'])
 # -Add title to the plotbox
-theta_plots = PlotboxArgs(
+theta_plots = PlotBoxArgs(
     title="Multiple theta plots",
     plots=['theta', 'theta_e']
 )
 # -Use Plot args to name different curves in the legend,
 # -Use 'labels' to get more detailed x and y labels
 # -Use rad2deg to automatically wrap angles and convert radians to degrees
-psi_plots = PlotboxArgs(
+psi_plots = PlotBoxArgs(
     title="Multiple psi plots",
     plots=[PlotArgs('True psi', states=['psi']),
            PlotArgs('Estimated psi', states='psi_e')],
@@ -33,20 +33,20 @@ second_row = [phi_plots, theta_plots, psi_plots]
 
 ## Two dimensional plots
 # -Simple 2D plot. Use PlotArgs to combine two states into a 2D plot
-xy_plot = PlotboxArgs(
+xy_plot = PlotBoxArgs(
     title="XY Plane",
     plots=[PlotArgs(states=['x', 'y']),
            PlotArgs(states=['x_truth', 'y_truth'])]
 )
 # -Add names to the different 2D curves
-xz_plot = PlotboxArgs(
+xz_plot = PlotBoxArgs(
     title="XZ plane",
     plots=[PlotArgs('Estimated xz position', states=['x', 'z']),
            PlotArgs('True xz position', states=['x_truth', 'z_truth'])]
 )
 # -Add extra labels to the plotbox for clarity
 # -Use max_length to only plot the last 100 data points
-yz_plot = PlotboxArgs(
+yz_plot = PlotBoxArgs(
     title="YZ plane",
     plots=[PlotArgs('Estimated yz position', states=['y', 'z']),
            PlotArgs('True yz position', states=['y_truth', 'z_truth'])],

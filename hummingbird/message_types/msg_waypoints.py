@@ -11,7 +11,7 @@ import numpy as np
 from hummingbird.parameters import planner_parameters as PLAN
 
 
-class msg_waypoints:
+class MsgWaypoints:
     def __init__(self):
         # the first two flags are used for interacting with the path planner
         #

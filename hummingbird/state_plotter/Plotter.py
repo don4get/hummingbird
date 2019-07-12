@@ -4,9 +4,9 @@ import numpy as np
 from collections import defaultdict
 import pyqtgraph as pg
 import argparse
-from hummingbird.state_plotter.plotter_args import PlotArgs, PlotboxArgs
-from hummingbird.state_plotter.state_plotbox import StatePlotbox
-from hummingbird.state_plotter.moveable_window import MoveableWindow
+from hummingbird.state_plotter.plotter_args import PlotArgs, PlotBoxArgs
+from hummingbird.state_plotter.state_plotbox import StatePlotBox
+from hummingbird.state_plotter.moveable_window import MovableWindow
 
 # Enable antialiasing for prettier plots
 pg.setConfigOptions(antialias=True)
@@ -47,7 +47,7 @@ class Plotter:
         self.default_window_size = (900, 700)
         self.app = pg.QtGui.QApplication([])
         # self.window = pg.GraphicsWindow(title="States")
-        self.window = MoveableWindow(title="States")
+        self.window = MovableWindow(title="States")
         self.window.resize(*self.default_window_size)
         self.window.setBackground(self.background_color)
         self.window.location_on_the_screen(*args)
@@ -216,7 +216,7 @@ class Plotter:
 
     def _add_plot_box(self, plotbox_args):
         ''' Adds a plot box to the plotting window '''
-        plotbox = StatePlotbox(self.window, plotbox_args)
+        plotbox = StatePlotBox(self.window, plotbox_args)
         if plotbox_args.title in self.plotboxes:
             raise ValueError('Plotbox with title \"{}\" already exists in the window.' \
                              .format(plotbox_args.title) \
@@ -280,6 +280,6 @@ class Plotter:
             plots.append(PlotArgs(plot_name, states=c))
         for h in args.hidden_curves:
             plots.append(PlotArgs(h, hidden=True))
-        plotbox_args = PlotboxArgs(title=args.name, plots=plots, legend=args.legend)
+        plotbox_args = PlotBoxArgs(title=args.name, plots=plots, legend=args.legend)
 
         return plotbox_args

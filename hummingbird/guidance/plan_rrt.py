@@ -1,16 +1,16 @@
 import numpy as np
-from hummingbird.message_types.msg_waypoints import msg_waypoints
+from hummingbird.message_types.msg_waypoints import MsgWaypoints
 from hummingbird.parameters import planner_parameters as PLAN
 
 
-class Node():
-    def __init__(self, ned=[0, 0, 0], parent_id=0, cost=0, connectToGoalFlag=0,
-                 isGoal=0):
+class Node:
+    def __init__(self, ned=(0, 0, 0), parent_id=0, cost=0, connect_to_goal_flag=0,
+                 is_goal=0):
         self.ned = np.array(ned)
         self.parent_id = parent_id
         self.cost = cost
-        self.connectToGoalFlag = connectToGoalFlag
-        self.isGoal = isGoal
+        self.connectToGoalFlag = connect_to_goal_flag
+        self.isGoal = is_goal
 
     def copy(self):
         new_node = Node()
@@ -43,7 +43,7 @@ class planRRT():
         # specify start and end nodes from wp_start and wp_end
         # format: N, E, D, parent_id, cost, connectsToGoalFlag
         start_node = Node([wp_start[0], wp_start[1], self.pd], parent_id=-1)
-        end_node = Node([wp_end[0], wp_end[1], self.pd], isGoal=1)
+        end_node = Node([wp_end[0], wp_end[1], self.pd], is_goal=1)
 
         # establish tree starting with the start node
         tree = np.array([start_node])
@@ -213,7 +213,7 @@ class planRRT():
         return np.linalg.norm(node2.ned - node1.ned)
 
     def createWaypoints(self, path, wp_type):
-        waypoints = msg_waypoints()
+        waypoints = MsgWaypoints()
         neds = np.zeros((path.size, 3))
         courses = np.zeros(path.size)
         for i in range(path.size):

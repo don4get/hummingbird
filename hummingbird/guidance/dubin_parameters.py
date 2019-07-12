@@ -12,7 +12,7 @@ import sys
 sys.path.append('..')
 
 
-class dubins_parameters:
+class DubinParameters:
     def __init__(self):
         self.p_s = np.inf * np.ones(3)  # the start position in re^3
         self.chi_s = np.inf  # the start course angle
