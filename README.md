@@ -1,5 +1,5 @@
 # Hummingbird [![Build Status](https://travis-ci.org/don4get/hummingbird.svg?branch=master)](https://travis-ci.org/don4get/hummingbird)
-![](resources/hummingbird.gif)
+![](hummingbird/resources/hummingbird.gif)
 ### Incentive
 
 **hummingbird** aims to model fixedwind UAVs and allow their sizing / tuning.
