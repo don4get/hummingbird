@@ -1,4 +1,4 @@
-# Hummingbird
+# Hummingbird [![Build Status](https://travis-ci.org/don4get/hummingbird.svg?branch=master)](https://travis-ci.org/don4get/hummingbird)
 ![](resources/hummingbird.gif)
 ### Incentive
 
