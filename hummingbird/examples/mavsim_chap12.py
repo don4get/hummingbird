@@ -1,10 +1,3 @@
-"""
-mavsim_python
-    - Chapter 12 assignment for Beard & McLain, PUP, 2012
-    - Last Update:
-        4/3/2019 - BGM
-"""
-
 import numpy as np
 from hummingbird.parameters import simulation_parameters as sim, planner_parameters\
     as plan

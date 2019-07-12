@@ -1,72 +1,56 @@
-"""
-mavSimPy
-    - Chapter 2 assignment for Beard & McLain, PUP, 2012
-    - Update history:
-        1/10/2019 - RWB
-"""
-import sys
-
-sys.path.append('..')
-
-# import viewers and video writer
-# from chap2.spacecraft_viewer import spacecraft_viewer
-from chap2.mav_viewer import mav_viewer
-# from chap2.video_writer import video_writer
-
-# import parameters
-from hummingbird import parameters as SIM
-# import message types
-from hummingbird.message_types import msg_state
+from hummingbird.graphics.mav_viewer import MavViewer
+from hummingbird.parameters import simulation_parameters as sim_p
+from hummingbird.message_types.msg_state import MsgState
+from hummingbird.graphics.video_writer import VideoWriter
 
 # initialize messages
-state = msg_state()  # instantiate state message
+state = MsgState()  # instantiate state message
 
 # initialize viewers and video
-VIDEO = False  # True==write video, False==don't write video
+record_video = False  # True==write video, False==don't write video
 # mav_view = spacecraft_viewer()
-mav_view = mav_viewer()
-if VIDEO == True:
-    video = video_writer(video_name="chap2_video.avi",
-                         bounding_box=(0, 0, 1000, 1000),
-                         output_rate=SIM.ts_video)
+mav_view = MavViewer()
+if record_video:
+    video = VideoWriter(video_name="chap2_video.avi",
+                        bounding_box=(0, 0, 1000, 1000),
+                        output_rate=sim_p.ts_video)
 
 # initialize the simulation time
-sim_time = SIM.start_time
-
+sim_time = sim_p.start_time
 
 def trans_rot(sim_time):
-    if sim_time < SIM.end_time / 6:
-        state.pn += 10 * SIM.ts_simulation
-    elif sim_time < 2 * SIM.end_time / 6:
-        state.pe += 10 * SIM.ts_simulation
-    elif sim_time < 3 * SIM.end_time / 6:
-        state.h += 10 * SIM.ts_simulation
-    elif sim_time < 4 * SIM.end_time / 6:
-        state.phi += 0.1 * SIM.ts_simulation
-    elif sim_time < 5 * SIM.end_time / 6:
-        state.theta += 0.1 * SIM.ts_simulation
+    if sim_time < sim_p.end_time / 6:
+        state.pn += 10 * sim_p.ts_simulation
+    elif sim_time < 2 * sim_p.end_time / 6:
+        state.pe += 10 * sim_p.ts_simulation
+    elif sim_time < 3 * sim_p.end_time / 6:
+        state.h += 10 * sim_p.ts_simulation
+    elif sim_time < 4 * sim_p.end_time / 6:
+        state.phi += 0.1 * sim_p.ts_simulation
+    elif sim_time < 5 * sim_p.end_time / 6:
+        state.theta += 0.1 * sim_p.ts_simulation
     else:
-        state.psi += 0.1 * SIM.ts_simulation
+        state.psi += 0.1 * sim_p.ts_simulation
 
 
 def rot_trans(sim_time):
-    if sim_time < SIM.end_time / 6:
-        state.phi += 0.1 * SIM.ts_simulation
-    elif sim_time < 2 * SIM.end_time / 6:
-        state.theta += 0.1 * SIM.ts_simulation
-    elif sim_time < 3 * SIM.end_time / 6:
-        state.psi += 0.1 * SIM.ts_simulation
-    elif sim_time < 4 * SIM.end_time / 6:
-        state.pn += 10 * SIM.ts_simulation
-    elif sim_time < 5 * SIM.end_time / 6:
-        state.pe += 10 * SIM.ts_simulation
+    if sim_time < sim_p.end_time / 6:
+        state.phi += 0.1 * sim_p.ts_simulation
+    elif sim_time < 2 * sim_p.end_time / 6:
+        state.theta += 0.1 * sim_p.ts_simulation
+    elif sim_time < 3 * sim_p.end_time / 6:
+        state.psi += 0.1 * sim_p.ts_simulation
+    elif sim_time < 4 * sim_p.end_time / 6:
+        state.pn += 10 * sim_p.ts_simulation
+    elif sim_time < 5 * sim_p.end_time / 6:
+        state.pe += 10 * sim_p.ts_simulation
     else:
-        state.h += 10 * SIM.ts_simulation
+        state.h += 10 * sim_p.ts_simulation
 
 
 # main simulation loop
 T = 2.5
-while sim_time < SIM.end_time:
+while sim_time < sim_p.end_time:
     # -------vary states to check viewer-------------
     # print(sim_time)
 
@@ -75,10 +59,12 @@ while sim_time < SIM.end_time:
 
     # -------update viewer and video-------------
     mav_view.update(state)
-    if VIDEO == True: video.update(sim_time)
+    if record_video:
+        video.update(sim_time)
 
     # -------increment time-------------
-    sim_time += SIM.ts_simulation
+    sim_time += sim_p.ts_simulation
 
 print("Press Ctrl-Q to exit...")
-if VIDEO == True: video.close()
+if record_video:
+    video.close()

@@ -1,5 +1,5 @@
-from hummingbird.state_plotter.plotter import Plotter
-from hummingbird.state_plotter.plotter_args import *
+from hummingbird.graphics.plotter import Plotter
+from hummingbird.graphics.plotter_args import *
 
 
 class DataViewer:

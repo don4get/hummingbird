@@ -1,6 +1,12 @@
 import numpy as np
 import cv2
-import pyscreenshot as ImageGrab
+
+import os
+# For more information about this if statement, see: https://stackoverflow.com/a/43659488
+if os.name == 'nt':
+    from PIL import ImageGrab
+elif os.name == 'posix':
+    import pyscreenshot as ImageGrab
 
 
 class VideoWriter:

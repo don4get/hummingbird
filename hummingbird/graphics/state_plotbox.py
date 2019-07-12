@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import pyqtgraph as pg
 from pyqtgraph import ViewBox
-from hummingbird.state_plotter.plotter_args import PlotBoxArgs
-from hummingbird.state_plotter.state_plot import StatePlot
+from hummingbird.graphics.plotter_args import PlotBoxArgs
+from hummingbird.graphics.state_plot import StatePlot
 
 
 class StatePlotBox:

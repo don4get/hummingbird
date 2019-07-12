@@ -1,14 +1,3 @@
-"""
-mavSimPy 
-    - Chapter 5 assignment for Beard & McLain, PUP, 2012
-    - Update history:  
-        1/1/2019 - RWB
-        1/29/2019 - RWB
-        2/2/2019 - RWB
-"""
-import sys
-
-sys.path.append('..')
 import numpy as np
 from hummingbird import parameters as SIM
 

@@ -1,12 +1,3 @@
-"""
-mavsim_python
-    - Chapter 11 assignment for Beard & McLain, PUP, 2012
-    - Last Update:
-        3/26/2019 - RWB
-"""
-import sys
-
-sys.path.append('..')
 import numpy as np
 from hummingbird import parameters as SIM, parameters as PLAN
 

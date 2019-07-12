@@ -4,9 +4,9 @@ import numpy as np
 from collections import defaultdict
 import pyqtgraph as pg
 import argparse
-from hummingbird.state_plotter.plotter_args import PlotArgs, PlotBoxArgs
-from hummingbird.state_plotter.state_plotbox import StatePlotBox
-from hummingbird.state_plotter.movable_window import MovableWindow
+from hummingbird.graphics.plotter_args import PlotArgs, PlotBoxArgs
+from hummingbird.graphics.state_plotbox import StatePlotBox
+from hummingbird.graphics.movable_window import MovableWindow
 
 # Enable antialiasing for prettier plots
 pg.setConfigOptions(antialias=True)

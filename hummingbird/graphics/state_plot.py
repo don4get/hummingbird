@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import pyqtgraph as pg
 from collections import OrderedDict
-from hummingbird.state_plotter.plotter_args import PlotArgs
-from hummingbird.state_plotter.state_data import StateData
+from hummingbird.graphics.plotter_args import PlotArgs
+from hummingbird.graphics.state_data import StateData
 import numpy as np
 
 
