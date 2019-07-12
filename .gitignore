@@ -3,6 +3,4 @@
 *__pycache__
 *.swp
 
-
-mavsim_matlab
-mavsim_simulink
+venv/
