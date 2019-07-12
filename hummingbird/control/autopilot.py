@@ -9,7 +9,7 @@ import numpy as np
 
 sys.path.append('..')
 from hummingbird.parameters import control_parameters as AP
-from .pid_control import pi_control, pd_control_with_rate
+from hummingbird.control.pid_control import pi_control, pd_control_with_rate
 from hummingbird.message_types.msg_state import msg_state
 from hummingbird.tools.transfer_function import transfer_function
 

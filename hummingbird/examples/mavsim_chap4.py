@@ -12,7 +12,7 @@ import numpy as np
 from hummingbird import parameters as SIM
 
 from chap2.mav_viewer import mav_viewer
-from hummingbird.chap12 import video_writer
+from hummingbird.graphics import video_writer
 from chap3.data_viewer import data_viewer
 from chap4.mav_dynamics import mav_dynamics
 from chap4.wind_simulation import wind_simulation

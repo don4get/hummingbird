@@ -13,7 +13,7 @@ import pyqtgraph as pg
 import pyqtgraph.opengl as gl
 
 from hummingbird.tools.rotations import Euler2Rotation
-from .dubins_parameters import dubins_parameters
+from hummingbird.guidance.dubins_parameters import dubins_parameters
 
 
 class world_viewer():

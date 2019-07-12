@@ -9,7 +9,7 @@ import sys
 
 sys.path.append('..')
 from hummingbird.message_types.msg_waypoints import msg_waypoints
-from .planRRT import planRRT
+from hummingbird.guidance.planRRT import planRRT
 
 
 class path_planner:

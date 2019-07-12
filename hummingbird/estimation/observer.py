@@ -11,8 +11,8 @@ sys.path.append('..')
 from hummingbird.parameters import aerosonde_parameters as MAV
 
 from hummingbird.message_types.msg_state import msg_state
-from .ekf_attitude import ekf_attitude
-from .ekf_position import ekf_position
+from hummingbird.estimation.ekf_attitude import ekf_attitude
+from hummingbird.estimation.ekf_position import ekf_position
 
 
 class observer:

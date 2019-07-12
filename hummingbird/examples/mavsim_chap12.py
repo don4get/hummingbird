@@ -11,16 +11,16 @@ import numpy as np
 from hummingbird.parameters import simulation_parameters as SIM, planner_parameters\
     as PLAN
 
-from hummingbird.chap12.data_viewer import data_viewer
-from hummingbird.chap12.wind_simulation import wind_simulation
-from hummingbird.chap12.autopilot import autopilot
-from hummingbird.chap12.mav_dynamics import mav_dynamics
-from hummingbird.chap12.observer import observer
-from hummingbird.chap12.path_follower import path_follower
-from hummingbird.chap12.path_manager\
+from hummingbird.graphics.data_viewer import data_viewer
+from hummingbird.physics.wind_simulation import wind_simulation
+from hummingbird.control.autopilot import autopilot
+from hummingbird.physics.mav_dynamics import mav_dynamics
+from hummingbird.estimation.observer import observer
+from hummingbird.guidance.path_follower import path_follower
+from hummingbird.guidance.path_manager \
     import path_manager
-from hummingbird.chap12.world_viewer import world_viewer
-from hummingbird.chap12.path_planner import path_planner
+from hummingbird.graphics.world_viewer import world_viewer
+from hummingbird.guidance.path_planner import path_planner
 
 # initialize the visualization
 world_view = world_viewer()  # initialize the viewer

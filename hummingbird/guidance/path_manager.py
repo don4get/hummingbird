@@ -2,7 +2,7 @@ import numpy as np
 import sys
 
 sys.path.append('..')
-from .dubins_parameters import dubins_parameters
+from hummingbird.guidance.dubins_parameters import dubins_parameters
 from hummingbird.message_types.msg_path import msg_path
 
 
