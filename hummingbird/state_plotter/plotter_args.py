@@ -2,7 +2,7 @@ import numpy as np
 
 
 class PlotBoxArgs:
-    ''' Class for storing and validating StatePlotbox arguments
+    """ Class for storing and validating StatePlotbox arguments
 
     Arguments:
         -title (str): title of the plotbox. If None, the first plot name will be used.
@@ -26,7 +26,7 @@ class PlotBoxArgs:
         -is_angle (bool): If True, the data will be treated as an angle and will wrap between -pi and pi
         -rad2deg (bool): If True, the data will be converted from radians to degrees.
             Note: If rad2deg is True, is_angle will be forced to True.
-    '''
+    """
 
     def __init__(self, title=None, plots=None, sigma_bounds=None, legend=True,
                  time_window=15.0, max_length=None,
@@ -90,7 +90,7 @@ class PlotBoxArgs:
 
 
 class PlotArgs:
-    ''' Class for storing and validating StatePlot arguments
+    """ Class for storing and validating StatePlot arguments
 
     Arguments:
         name (str): Name of the plot to be displayed in the legend.
@@ -116,7 +116,7 @@ class PlotArgs:
         hidden (bool): If True, this plot will not be rendered and will not show up in the legend
             This is useful for debugging or only viewing one of multiple plots in a plotbox
             with minimal changes to the initialization code
-    '''
+    """
 
     def __init__(self, name=None, states=None, sigma_bounds=None,
                  is_angle=None, rad2deg=None, max_length=None,

@@ -2,11 +2,11 @@ import numpy as np
 import sys
 
 sys.path.append('..')
-from hummingbird.guidance.dubin_parameters import DubinParameters
+from hummingbird.guidance.dubin_parameters import DubinsParameters
 from hummingbird.message_types.msg_path import MsgPath
 
 
-class path_manager:
+class PathManager:
     def __init__(self):
         # message sent to path follower
         self.path = MsgPath()
@@ -23,12 +23,12 @@ class path_manager:
         # state of the manager state machine
         self.manager_state = 1
         # dubins path parameters
-        self.dubins_path = DubinParameters()
+        self.dubins_path = DubinsParameters()
         self.state_changed = True
 
     def update(self, waypoints, radius, state):
         # this flag is set for one time step to signal a redraw in the viewer
-        if waypoints.flag_waypoints_changed == True:
+        if waypoints.flag_waypoints_changed:
             self.num_waypoints = waypoints.num_waypoints
             self.flag_need_new_waypoints = False
             self.initialize_pointers()
@@ -73,7 +73,7 @@ class path_manager:
         self.path.line_origin = w_prev
         self.path.line_direction = q_prev
 
-        if self.inHalfSpace(p):
+        if self.in_half_space(p):
             self.increment_pointers()
             self.path.flag_path_changed = True
             self.path.line_origin = waypoints.ned[self.ptr_prev]
@@ -104,7 +104,7 @@ class path_manager:
             self.halfspace_r = z
             self.halfspace_n = q_prev
 
-            switch = self.inHalfSpace(p)
+            switch = self.in_half_space(p)
             if switch:
                 self.manager_state = 2
                 self.state_changed = True
@@ -130,7 +130,7 @@ class path_manager:
             self.halfspace_r = z
             self.halfspace_n = qi
 
-            if self.inHalfSpace(p):
+            if self.in_half_space(p):
                 self.increment_pointers()
                 self.manager_state = 1
                 self.state_changed = True
@@ -187,7 +187,7 @@ class path_manager:
     def check_for_switchstate(self, r, n, p):
         self.halfspace_r = r
         self.halfspace_n = n
-        if self.inHalfSpace(p):
+        if self.in_half_space(p):
             self.manager_state += 1
             if self.manager_state > 5:
                 self.manager_state = 1
@@ -216,7 +216,7 @@ class path_manager:
             self.ptr_next = 0
         self.ptrs_updated = True
 
-    def inHalfSpace(self, pos):
+    def in_half_space(self, pos):
         if (pos - self.halfspace_r) @ self.halfspace_n >= 0:
             return True
         else:

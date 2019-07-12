@@ -1,22 +1,6 @@
-"""
-mavDynamics - Chapter 8
-    - this file implements the dynamic equations of motion for MAV
-    - use unit quaternion for the attitude state
-    
-mavsim_python
-    - Beard & McLain, PUP, 2012
-    - Update history:  
-        2/16/2019 - RWB
-"""
-import sys
-
-sys.path.append('..')
 import numpy as np
-
-# load message types
 from hummingbird.message_types.msg_state import MsgState
 from hummingbird.message_types.msg_sensors import MsgSensors
-
 from hummingbird.parameters import aerosonde_parameters as MAV
 import hummingbird.parameters.sensor_parameters as SENSOR
 from hummingbird.tools.rotations import Quaternion2Rotation, Quaternion2Euler
@@ -68,12 +52,12 @@ class MavDynamics:
     ###################################
     # public functions
     def update(self, delta, wind=np.zeros(6)):
-        '''
+        """
             Integrate the differential equations defining dynamics, update sensors
             delta = (delta_a, delta_e, delta_r, delta_t) are the control inputs
             wind is the wind vector in inertial coordinates
             Ts is the time step between function calls.
-        '''
+        """
 
         # get forces and moments acting on rigid bod
         forces_moments = self._forces_moments(delta)
@@ -107,10 +91,10 @@ class MavDynamics:
         self._update_true_state()
 
     def update_sensors(self):
-        '''
+        """
             Return value of sensors on MAV: gyros, accels, static_pressure, 
             dynamic_pressure, GPS
-        '''
+        """
         theta = self.true_state.theta
         phi = self.true_state.phi
         g = MAV.gravity

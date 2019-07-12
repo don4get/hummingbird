@@ -10,70 +10,70 @@ class DataViewer:
         # set up the plot window
         # define first row
         pn_plots = PlotBoxArgs(plots=['pn', 'pn_e'],
-                               labels={'left': 'pn(m)', 'bottom': 'Time (s)'},
+                               labels={'left': 'pn (m)', 'bottom': 'Time (s)'},
                                time_window=time_window_length)
         pe_plots = PlotBoxArgs(plots=['pe', 'pe_e'],
-                               labels={'left': 'pe(m)', 'bottom': 'Time (s)'},
+                               labels={'left': 'pe (m)', 'bottom': 'Time (s)'},
                                time_window=time_window_length)
         h_plots = PlotBoxArgs(plots=['h', 'h_e', 'h_c'],
-                              labels={'left': 'h(m)', 'bottom': 'Time (s)'},
+                              labels={'left': 'h (m)', 'bottom': 'Time (s)'},
                               time_window=time_window_length)
         wind_plots = PlotBoxArgs(plots=['wn', 'wn_e', 'we', 'we_e'],
-                                 labels={'left': 'wind(m/s)', 'bottom': 'Time (s)'},
+                                 labels={'left': 'wind (m/s)', 'bottom': 'Time (s)'},
                                  time_window=time_window_length)
         first_row = [pn_plots, pe_plots, h_plots, wind_plots]
 
         # define second row
         Va_plots = PlotBoxArgs(plots=['Va', 'Va_e', 'Va_c'],
-                               labels={'left': 'Va(m/s)', 'bottom': 'Time (s)'},
+                               labels={'left': 'Va (m/s)', 'bottom': 'Time (s)'},
                                time_window=time_window_length)
         alpha_plots = PlotBoxArgs(plots=['alpha', 'alpha_e'],
-                                  labels={'left': 'alpha(deg)', 'bottom': 'Time (s)'},
+                                  labels={'left': 'alpha (deg)', 'bottom': 'Time (s)'},
                                   rad2deg=True,
                                   time_window=time_window_length)
         beta_plots = PlotBoxArgs(plots=['beta', 'beta_e'],
-                                 labels={'left': 'beta(deg)', 'bottom': 'Time (s)'},
+                                 labels={'left': 'beta (deg)', 'bottom': 'Time (s)'},
                                  rad2deg=True,
                                  time_window=time_window_length)
         Vg_plots = PlotBoxArgs(plots=['Vg', 'Vg_e'],
-                               labels={'left': 'Vg(m/s)', 'bottom': 'Time (s)'},
+                               labels={'left': 'Vg (m/s)', 'bottom': 'Time (s)'},
                                time_window=time_window_length)
         second_row = [Va_plots, alpha_plots, beta_plots, Vg_plots]
 
         # define third row
         phi_plots = PlotBoxArgs(plots=['phi', 'phi_e', 'phi_c'],
-                                labels={'left': 'phi(deg)', 'bottom': 'Time (s)'},
+                                labels={'left': 'phi (deg)', 'bottom': 'Time (s)'},
                                 rad2deg=True,
                                 time_window=time_window_length)
         theta_plots = PlotBoxArgs(plots=['theta', 'theta_e', 'theta_c'],
-                                  labels={'left': 'theta(deg)', 'bottom': 'Time (s)'},
+                                  labels={'left': 'theta (deg)', 'bottom': 'Time (s)'},
                                   rad2deg=True,
                                   time_window=time_window_length)
         psi_plots = PlotBoxArgs(plots=['psi', 'psi_e'],
-                                labels={'left': 'psi(deg)', 'bottom': 'Time (s)'},
+                                labels={'left': 'psi (deg)', 'bottom': 'Time (s)'},
                                 rad2deg=True,
                                 time_window=time_window_length)
         chi_plots = PlotBoxArgs(plots=['chi', 'chi_e', 'chi_c'],
-                                labels={'left': 'chi(deg)', 'bottom': 'Time (s)'},
+                                labels={'left': 'chi (deg)', 'bottom': 'Time (s)'},
                                 rad2deg=True,
                                 time_window=time_window_length)
         third_row = [phi_plots, theta_plots, psi_plots, chi_plots]
 
         # define fourth row
         p_plots = PlotBoxArgs(plots=['p', 'p_e'],
-                              labels={'left': 'p(deg/s)', 'bottom': 'Time (s)'},
+                              labels={'left': 'p (deg/s)', 'bottom': 'Time (s)'},
                               rad2deg=True,
                               time_window=time_window_length)
         q_plots = PlotBoxArgs(plots=['q', 'q_e'],
-                              labels={'left': 'q(deg/s)', 'bottom': 'Time (s)'},
+                              labels={'left': 'q (deg/s)', 'bottom': 'Time (s)'},
                               rad2deg=True,
                               time_window=time_window_length)
         r_plots = PlotBoxArgs(plots=['r', 'r_e'],
-                              labels={'left': 'r(deg)', 'bottom': 'Time (s)'},
+                              labels={'left': 'r (deg)', 'bottom': 'Time (s)'},
                               rad2deg=True,
                               time_window=time_window_length)
         gyro_plots = PlotBoxArgs(plots=['bx', 'bx_e', 'by', 'by_e', 'bz', 'bz_e'],
-                                 labels={'left': 'bias(deg/s)', 'bottom': 'Time (s)'},
+                                 labels={'left': 'bias (deg/s)', 'bottom': 'Time (s)'},
                                  rad2deg=True,
                                  time_window=time_window_length)
         fourth_row = [p_plots, q_plots, r_plots, gyro_plots]
@@ -100,7 +100,8 @@ class DataViewer:
                     commanded_state.phi,  # phi_c
                     commanded_state.theta,  # theta_c
                     commanded_state.chi]  # chi_c
-        ## Add the state data in vectors
+
+        # Add the state data in vectors
         # the order has to match the order in lines 72-76
         true_state_list = [true_state.pn, true_state.pe, true_state.h,
                            true_state.Va, true_state.alpha, true_state.beta,

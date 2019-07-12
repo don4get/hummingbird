@@ -1,22 +1,19 @@
-import sys
 import numpy as np
-
-sys.path.append('..')
-from hummingbird.parameters import simulation_parameters as SIM, aerosonde_parameters as MAV
-import hummingbird.parameters.sensor_parameters as SENSOR
+from hummingbird.parameters import simulation_parameters as sim_p, aerosonde_parameters as mav_p
+import hummingbird.parameters.sensor_parameters as sensors_p
 from hummingbird.tools.rotations import jacobian
 
 
 class EkfAttitude:
-    # implement continous-discrete EKF to estimate roll and pitch angles
+    # implement continuous-discrete EKF to estimate roll and pitch angles
     def __init__(self):
         self.Q = np.diag([1e-6, 1e-6])
-        self.Q_gyro = np.eye(3) * SENSOR.gyro_sigma ** 2
-        self.R_accel = np.eye(3) * SENSOR.accel_sigma ** 2
+        self.Q_gyro = np.eye(3) * sensors_p.gyro_sigma ** 2
+        self.R_accel = np.eye(3) * sensors_p.accel_sigma ** 2
         self.N = 10  # number of prediction step per sample
         self.xhat = np.zeros(2)  # initial state: phi, theta
         self.P = np.eye(2) * 0.1
-        self.Ts = SIM.ts_control / self.N
+        self.Ts = sim_p.ts_control / self.N
 
     def update(self, state, measurement):
         self.propagate_model(state)
@@ -42,7 +39,7 @@ class EkfAttitude:
         q = state.q
         r = state.r
         Va = state.Va
-        g = MAV.gravity
+        g = mav_p.gravity
         sphi = np.sin(x[0])
         cphi = np.cos(x[0])
         stheta = np.sin(x[1])

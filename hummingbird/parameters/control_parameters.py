@@ -1,6 +1,3 @@
-import sys
-
-sys.path.append('..')
 from hummingbird.parameters import simulation_parameters as SP
 
 ts_control = SP.ts_control

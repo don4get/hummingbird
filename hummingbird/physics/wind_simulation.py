@@ -1,11 +1,3 @@
-"""
-Class to determine wind velocity at any given moment,
-calculates a steady wind speed and uses a stochastic
-process to represent wind gusts. (Follows section 4.4 in uav book)
-"""
-import sys
-
-sys.path.append('..')
 import numpy as np
 from hummingbird.parameters import aerosonde_parameters as MAV
 

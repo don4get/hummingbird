@@ -3,7 +3,7 @@ from math import sin, cos, atan, atan2
 from hummingbird.message_types.msg_autopilot import MsgAutopilot
 from hummingbird.message_types.msg_path import MsgPath
 from hummingbird.message_types.msg_state import MsgState
-
+from hummingbird.tools.wrap import wrap
 
 class PathFollower:
     def __init__(self):
@@ -23,7 +23,7 @@ class PathFollower:
     def _follow_straight_line(self, path=MsgPath(), state=MsgState()):
         q = np.copy(path.line_direction)
         chi_q = atan2(q[1], q[0])
-        chi_q = self._wrap(chi_q, state.chi)
+        chi_q = wrap(chi_q, state.chi)
 
         Rp_i = np.array([[cos(chi_q), sin(chi_q), 0],
                          [-sin(chi_q), cos(chi_q), 0],
@@ -61,23 +61,17 @@ class PathFollower:
             lmbda = -1
 
         var_phi = atan2(d[1], d[0])
-        var_phi = self._wrap(var_phi, state.chi)
+        var_phi = wrap(var_phi, state.chi)
         chi_0 = var_phi + lmbda * (np.pi / 2)
         chi_c = chi_0 + lmbda * atan(self.k_orbit * (np.linalg.norm(d) - rho) / rho)
 
         Vg = state.Vg
         chi = state.chi
         psi = state.psi
-        phi_feedfw = atan(Vg ** 2 / (self.gravity * rho * cos(chi - psi)))
+        phi_ff = atan(Vg ** 2 / (self.gravity * rho * cos(chi - psi)))
 
         self.autopilot_commands.airspeed_command = path.airspeed
         self.autopilot_commands.course_command = chi_c
         self.autopilot_commands.altitude_command = -path.orbit_center[2]
-        self.autopilot_commands.phi_feedforward = phi_feedfw
+        self.autopilot_commands.phi_feedforward = phi_ff
 
-    def _wrap(self, chi_c, chi):
-        while chi_c - chi > np.pi:
-            chi_c = chi_c - 2.0 * np.pi
-        while chi_c - chi < -np.pi:
-            chi_c = chi_c + 2.0 * np.pi
-        return chi_c

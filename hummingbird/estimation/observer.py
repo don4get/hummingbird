@@ -1,18 +1,9 @@
-"""
-observer
-    - Beard & McLain, PUP, 2012
-    - Last Update:
-        3/2/2019 - RWB
-"""
-import sys
 import numpy as np
-
-sys.path.append('..')
-from hummingbird.parameters import aerosonde_parameters as MAV
-
+from hummingbird.parameters import aerosonde_parameters as mav_p
 from hummingbird.message_types.msg_state import MsgState
 from hummingbird.estimation.ekf_attitude import EkfAttitude
-from hummingbird.estimation.ekf_position import ekf_position
+from hummingbird.estimation.ekf_position import EkfPosition
+from hummingbird.tools.alpha_filter import AlphaFilter
 
 
 class Observer:
@@ -20,19 +11,19 @@ class Observer:
         # initialized estimated state message
         self.estimated_state = MsgState()
         # use alpha filters to low pass filter gyros and accels
-        self.lpf_gyro_x = alpha_filter(alpha=0.5)
-        self.lpf_gyro_y = alpha_filter(alpha=0.5)
-        self.lpf_gyro_z = alpha_filter(alpha=0.5)
-        self.lpf_accel_x = alpha_filter(alpha=0.5)
-        self.lpf_accel_y = alpha_filter(alpha=0.5)
-        self.lpf_accel_z = alpha_filter(alpha=0.5)
+        self.lpf_gyro_x = AlphaFilter(alpha=0.5)
+        self.lpf_gyro_y = AlphaFilter(alpha=0.5)
+        self.lpf_gyro_z = AlphaFilter(alpha=0.5)
+        self.lpf_accel_x = AlphaFilter(alpha=0.5)
+        self.lpf_accel_y = AlphaFilter(alpha=0.5)
+        self.lpf_accel_z = AlphaFilter(alpha=0.5)
         # use alpha filters to low pass filter static and differential pressure
-        self.lpf_static = alpha_filter(alpha=0.9, y0=1350)
-        self.lpf_diff = alpha_filter(alpha=0.5)
+        self.lpf_static = AlphaFilter(alpha=0.9, y0=1350)
+        self.lpf_diff = AlphaFilter(alpha=0.5)
         # ekf for phi and theta
         self.attitude_ekf = EkfAttitude()
         # ekf for pn, pe, Vg, chi, wn, we, psi
-        self.position_ekf = ekf_position()
+        self.position_ekf = EkfPosition()
 
     def update(self, measurements):
         # estimates for p, q, r are low pass filter of gyro minus bias estimate
@@ -53,10 +44,8 @@ class Observer:
         diff_p = self.lpf_diff.update(measurements.diff_pressure)
         if diff_p < 0:
             diff_p = 0
-        self.estimated_state.h = static_p / (MAV.rho * MAV.gravity)
-        self.estimated_state.Va = np.sqrt(2 * diff_p / MAV.rho)
-
-        ##### EKFs #####
+        self.estimated_state.h = static_p / (mav_p.rho * mav_p.gravity)
+        self.estimated_state.Va = np.sqrt(2 * diff_p / mav_p.rho)
 
         # estimate phi and theta with simple ekf
         self.attitude_ekf.update(self.estimated_state, measurements)
@@ -71,15 +60,3 @@ class Observer:
         self.estimated_state.by = 0.0
         self.estimated_state.bz = 0.0
         return self.estimated_state
-
-
-class alpha_filter:
-    # alpha filter implements a simple low pass filter
-    # y[k] = alpha * y[k-1] + (1-alpha) * u[k]
-    def __init__(self, alpha=0.5, y0=0.0):
-        self.alpha = alpha  # filter parameter
-        self.y = y0  # initial condition
-
-    def update(self, u):
-        self.y = self.y * self.alpha + u * (1 - self.alpha)
-        return self.y

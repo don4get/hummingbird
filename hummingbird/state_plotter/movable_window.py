@@ -1,6 +1,4 @@
 import sys
-
-from PyQt5.QtWidgets import QDesktopWidget
 from PyQt5 import QtCore
 from pyqtgraph import GraphicsWindow
 

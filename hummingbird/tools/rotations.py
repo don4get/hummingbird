@@ -83,3 +83,9 @@ def jacobian(fun, x, state):
         df = (f_eps - f) / eps
         J[:, i] = df
     return J
+
+
+def rotz(theta):
+    return np.array([[np.cos(theta), -np.sin(theta), 0],
+                     [np.sin(theta), np.cos(theta), 0],
+                     [0, 0, 1]])

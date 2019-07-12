@@ -8,7 +8,7 @@ import sys
 
 sys.path.append('..')
 import numpy as np
-from hummingbird.tools import Quaternion2Euler
+from hummingbird.tools.rotations import Quaternion2Euler
 from control import TransferFunction as TF
 from hummingbird import parameters as MAV
 import pickle as pkl

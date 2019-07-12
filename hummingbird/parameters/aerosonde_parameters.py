@@ -1,6 +1,3 @@
-import sys
-
-sys.path.append('..')
 import numpy as np
 from hummingbird.tools.rotations import Euler2Quaternion
 
@@ -91,7 +88,7 @@ C_n_delta_r = -0.069
 #   Propeller thrust / torque parameters (see addendum by McLain)
 ######################################################################################
 # Prop parameters
-D_prop = 20 * (0.0254)  # prop diameter in m
+D_prop = 20 * 0.0254  # prop diameter in m
 
 # Motor parameters
 K_V = 145.  # from datasheet RPM/V
@@ -100,10 +97,10 @@ R_motor = 0.042  # ohms
 i0 = 1.5  # no-load (zero-torque) current (A)
 
 # Inputs
-ncells = 12.
-V_max = 3.7 * ncells  # max voltage for specified number of battery cells
+n_cells = 12.
+V_max = 3.7 * n_cells  # max voltage for specified number of battery cells
 
-# Coeffiecients from prop_data fit
+# Coefficients from prop_data fit
 C_Q2 = -0.01664
 C_Q1 = 0.004970
 C_Q0 = 0.005230

@@ -1,8 +1,5 @@
-import sys
-
-sys.path.append('..')
 import numpy as np
-from hummingbird.parameters import aerosonde_parameters as MAV
+from hummingbird.parameters import aerosonde_parameters as mav_p
 
 # size of the waypoint array used for the path planner.  This is the
 # maximum number of waypoints that might be transmitted to the path
@@ -10,13 +7,13 @@ from hummingbird.parameters import aerosonde_parameters as MAV
 size_waypoint_array = 100
 
 # airspeed commanded by planner
-Va0 = MAV.u0
+Va0 = mav_p.u0
 
 # max possible roll angle
 phi_max = np.radians(37)
 
 # minimum turn radius
-R_min = Va0 ** 2 / MAV.gravity / np.tan(phi_max)
+R_min = Va0 ** 2 / mav_p.gravity / np.tan(phi_max)
 
 # create random city map
 city_width = 2000  # the city is of size (width)x(width)

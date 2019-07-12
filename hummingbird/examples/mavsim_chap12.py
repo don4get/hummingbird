@@ -15,9 +15,9 @@ from hummingbird.physics.mav_dynamics import MavDynamics
 from hummingbird.estimation.observer import Observer
 from hummingbird.guidance.pathfollower import PathFollower
 from hummingbird.guidance.path_manager \
-    import path_manager
+    import PathManager
 from hummingbird.graphics.world_viewer import WorldViewer
-from hummingbird.guidance.path_planner import path_planner
+from hummingbird.guidance.path_planner import PathPlanner
 
 # initialize the visualization
 world_view = WorldViewer()  # initialize the viewer
@@ -32,8 +32,8 @@ mav = MavDynamics(sim.ts_simulation)
 ctrl = Autopilot(sim.ts_simulation)
 obsv = Observer(sim.ts_simulation)
 path_follow = PathFollower()
-path_manage = path_manager()
-path_plan = path_planner()
+path_manage = PathManager()
+path_plan = PathPlanner()
 
 from hummingbird.message_types.msg_map import MsgMap
 

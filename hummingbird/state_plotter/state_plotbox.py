@@ -7,7 +7,7 @@ from hummingbird.state_plotter.state_plot import StatePlot
 
 class StatePlotBox:
     def __init__(self, window, args):
-        ''' Create a new plotbox wrapper object
+        """ Create a new plotbox wrapper object
 
         Arguments:
             window (pg.GraphicsWindow): pyqtgraph window object in which to
@@ -15,7 +15,7 @@ class StatePlotBox:
             args (PlotboxArgs object): PlotboxArgs object which holds all the
                 appropriate arguments for the plotbox
 
-        '''
+        """
         if not isinstance(args, PlotBoxArgs):
             raise TypeError('\'args\' argument must be of type PlotboxArgs')
         # Initlialize plotbox
@@ -83,12 +83,12 @@ class StatePlotBox:
         return self.plotbox.vb.targetRange()[1]
 
     def update(self, t):
-        ''' Update the plot data and adjust viewing range
+        """ Update the plot data and adjust viewing range
 
         Arguments:
             t (float): the current time in seconds. Used to adjust the rolling
                 time window appropriately
-        '''
+        """
         for p in self.plots.values():
             p.update()
 
@@ -102,6 +102,6 @@ class StatePlotBox:
             # TODO: Add 3D support here
 
     def _get_color(self, index):
-        ''' Returns incremental plot colors based on index '''
+        """ Returns incremental plot colors based on index """
         return pg.intColor(index, minValue=self.plot_min_value, maxValue=self.plot_max_value,
                            hues=self.distinct_plot_hues, minHue=self.plot_min_hue, maxHue=self.plot_max_hue)

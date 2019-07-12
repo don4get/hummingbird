@@ -1,34 +1,15 @@
 import numpy as np
 from hummingbird.message_types.msg_waypoints import MsgWaypoints
-from hummingbird.parameters import planner_parameters as PLAN
+from hummingbird.parameters import planner_parameters as planner_p
 
 
-class Node:
-    def __init__(self, ned=(0, 0, 0), parent_id=0, cost=0, connect_to_goal_flag=0,
-                 is_goal=0):
-        self.ned = np.array(ned)
-        self.parent_id = parent_id
-        self.cost = cost
-        self.connectToGoalFlag = connect_to_goal_flag
-        self.isGoal = is_goal
-
-    def copy(self):
-        new_node = Node()
-        new_node.ned = np.array(self.ned)
-        new_node.parent_id = self.parent_id
-        new_node.cost = self.cost
-        new_node.connectToGoalFlag = self.connectToGoalFlag
-        new_node.isGoal = self.isGoal
-        return new_node
-
-
-class planRRT():
+class PlanRrt:
     def __init__(self):
         self.segmentLength = 400  # standard length of path segments
         self.margin = 20  # desired clearance between mav and obstacles
         self.dx = 5  # resolution of checking for collisions [meters]
 
-    def planPath(self, wp_start, wp_end, map, wp_type="fillet"):
+    def plan_path(self, wp_start, wp_end, map, wp_type="fillet"):
         # get buildings that are safe (short enough) for mav to fly over
         self.bldgs_tall = np.array(np.nonzero(map.bldg_heights > (100 - self.margin))).T
 
@@ -57,25 +38,25 @@ class planRRT():
             start_node.connectToGoalFlag = 1
             tree = np.append(tree, end_node)
         else:
-            numPaths = 0
-            while numPaths < 3:
-                tree, flag = self.extendTree(tree, end_node, map)
-                numPaths = numPaths + flag
+            num_paths = 0
+            while num_paths < 3:
+                tree, flag = self.extend_tree(tree, end_node, map)
+                num_paths = num_paths + flag
 
         # find path (array of Nodes) with minimum cost to end_node
-        paths = self.create_paths(tree, end_node, numPaths)
-        minpath = self.findMinimumPath(paths)  # ndarray of Nodes
-        minpath = self.smoothPath(minpath, map)  # msg_waypoints
-        waypoints = self.createWaypoints(minpath, wp_type)
+        paths = self.create_paths(tree, end_node, num_paths)
+        min_path = self.find_minimum_path(paths)  # ndarray of Nodes
+        min_path = self.smooth_path(min_path, map)  # msg_waypoints
+        waypoints = self.create_waypoints(min_path, wp_type)
         return waypoints
 
-    def generateRandomPoint(self, map):
-        limit = map.city_width
+    def generate_random_point(self, m):
+        limit = m.city_width
         pt = np.array([0, 0, self.pd])
         pt[:2] = np.random.uniform(0, limit, 2)
         return pt
 
-    def collision(self, start_node, end_node, map):
+    def collision(self, start_node, end_node, m):
         vec = end_node.ned - start_node.ned
         vec_norm = np.linalg.norm(vec)
         n_vec = vec / vec_norm  # normalized vector from start to end node
@@ -99,15 +80,15 @@ class planRRT():
         coll_pts = pts[colls]
         nearest_bldg = np.zeros(2, dtype=int)
         for coll_pt in coll_pts:
-            nearest_bldg[0] = np.argmin(np.abs(map.building_north - coll_pt[0]))
-            nearest_bldg[1] = np.argmin(np.abs(map.building_east - coll_pt[1]))
+            nearest_bldg[0] = np.argmin(np.abs(m.building_north - coll_pt[0]))
+            nearest_bldg[1] = np.argmin(np.abs(m.building_east - coll_pt[1]))
             for bldg in self.bldgs_tall:
                 if np.array_equal(bldg, nearest_bldg):
                     return True
 
         return False
 
-    def createNewNode(self, tree, pt):
+    def create_new_node(self, tree, pt):
         # first find closest node to pt
         vstar = Node()
         min_dist = -1
@@ -131,17 +112,17 @@ class planRRT():
         vplus = Node([xplus, yplus, self.pd], parent_id=index, cost=self.segmentLength)
         return vplus
 
-    def extendTree(self, tree, end_node, map):
+    def extend_tree(self, tree, end_node, m):
         while 1:
-            pt = self.generateRandomPoint(map)
-            vplus = self.createNewNode(tree, pt)
-            if not self.collision(tree[vplus.parent_id], vplus, map):
+            pt = self.generate_random_point(m)
+            vplus = self.create_new_node(tree, pt)
+            if not self.collision(tree[vplus.parent_id], vplus, m):
                 vplus.cost = self.segmentLength
                 tree = np.append(tree, vplus)
 
                 dist_end = np.linalg.norm(end_node.ned - vplus.ned)
                 if dist_end < self.segmentLength and \
-                        not self.collision(vplus, end_node, map):
+                        not self.collision(vplus, end_node, m):
                     vplus.connectToGoalFlag = 1
                     goal = end_node.copy()
                     goal.parent_id = tree.size - 1
@@ -150,7 +131,7 @@ class planRRT():
 
                 return tree, vplus.connectToGoalFlag
 
-    def findMinimumPath(self, paths):
+    def find_minimum_path(self, paths):
         cost_sums = np.array([0.] * paths.size)
         k = 0
         for k in range(paths.size):
@@ -161,7 +142,8 @@ class planRRT():
         minpath = paths[np.argmin(cost_sums)]
         return minpath
 
-    def create_paths(self, tree, end_node, numPaths):
+    @staticmethod
+    def create_paths(tree, end_node, numPaths):
         paths = np.array([end_node] * numPaths)
         k = 0
         for node_ in tree:
@@ -179,7 +161,7 @@ class planRRT():
 
         return paths
 
-    def smoothPath(self, path, map):
+    def smooth_path(self, path, map):
         path_smooth = np.array([path[0]])
         i = 0
         j = 1
@@ -187,13 +169,13 @@ class planRRT():
         while j < path.size - 1:
             point_added = False
             if self.collision(path[i], path[j + 1], map):
-                if self.distance(path[i], path[j]) > PLAN.R_min:
+                if self.distance(path[i], path[j]) > planner_p.R_min:
                     path_smooth = np.append(path_smooth, path[j])
                     i = j
                     point_added = True
                 else:
                     for k in range(1, j - i - 2):  # from 3rd-to-last node to 3rd node
-                        if self.distance(path[i], path[j - k]) > PLAN.R_min:
+                        if self.distance(path[i], path[j - k]) > planner_p.R_min:
                             path_smooth = np.append(path[i], path[j - k])
                             i = j
                             point_added = True
@@ -209,10 +191,12 @@ class planRRT():
 
         return path_smooth
 
-    def distance(self, node1, node2):
+    @staticmethod
+    def distance(node1, node2):
         return np.linalg.norm(node2.ned - node1.ned)
 
-    def createWaypoints(self, path, wp_type):
+    @staticmethod
+    def create_waypoints(path, wp_type):
         waypoints = MsgWaypoints()
         neds = np.zeros((path.size, 3))
         courses = np.zeros(path.size)
@@ -227,3 +211,22 @@ class planRRT():
 
         waypoints.add_waypoints(wp_type, neds, courses)
         return waypoints
+
+
+class Node:
+    def __init__(self, ned=(0, 0, 0), parent_id=0, cost=0, connect_to_goal_flag=0,
+                 is_goal=0):
+        self.ned = np.array(ned)
+        self.parent_id = parent_id
+        self.cost = cost
+        self.connectToGoalFlag = connect_to_goal_flag
+        self.isGoal = is_goal
+
+    def copy(self):
+        new_node = Node()
+        new_node.ned = np.array(self.ned)
+        new_node.parent_id = self.parent_id
+        new_node.cost = self.cost
+        new_node.connectToGoalFlag = self.connectToGoalFlag
+        new_node.isGoal = self.isGoal
+        return new_node

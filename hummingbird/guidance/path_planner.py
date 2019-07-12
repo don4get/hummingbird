@@ -1,22 +1,13 @@
-# path planner for mavsim_python
-#
-# mavsim_python
-#     - Beard & McLain, PUP, 2012
-#     - Last updated:
-#         4/3/2019 - BGM
 import numpy as np
-import sys
-
-sys.path.append('..')
 from hummingbird.message_types.msg_waypoints import MsgWaypoints
-from hummingbird.guidance.plan_rrt import planRRT
+from hummingbird.guidance.plan_rrt import PlanRrt
 
 
-class path_planner:
+class PathPlanner:
     def __init__(self):
         # waypoints definition
         self.waypoints = MsgWaypoints()
-        self.rrt = planRRT()
+        self.rrt = PlanRrt()
 
     def update(self, map, state):
         # planner_flag = 1  # return simple waypoint path
@@ -55,7 +46,7 @@ class path_planner:
             wp_start = np.array([state.pn, state.pe, -state.h])
             wp_end = np.array([map.city_width, map.city_width, -state.h])
 
-            waypoints = self.rrt.planPath(wp_start, wp_end, map)
+            waypoints = self.rrt.plan_path(wp_start, wp_end, map)
             self.waypoints.ned = waypoints.ned
             self.waypoints.airspeed = waypoints.airspeed
             self.waypoints.num_waypoints = waypoints.num_waypoints
@@ -65,7 +56,7 @@ class path_planner:
             wp_start = np.array([state.pn, state.pe, -state.h])
             wp_end = np.array([map.city_width, map.city_width, -state.h])
 
-            waypoints = self.rrt.planPath(wp_start, wp_end, map, self.waypoints.type)
+            waypoints = self.rrt.plan_path(wp_start, wp_end, map, self.waypoints.type)
             self.waypoints.ned = waypoints.ned
             self.waypoints.course = waypoints.course
             self.waypoints.airspeed = waypoints.airspeed

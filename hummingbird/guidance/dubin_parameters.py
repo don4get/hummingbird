@@ -1,18 +1,9 @@
-# dubins_parameters
-#   - Dubins parameters that define path between two configurations
-#
-# mavsim_matlab 
-#     - Beard & McLain, PUP, 2012
-#     - Update history:  
-#         3/26/2019 - RWB
-
 import numpy as np
-import sys
+from hummingbird.tools.rotations import rotz
+from hummingbird.tools.wrap import mod
 
-sys.path.append('..')
 
-
-class DubinParameters:
+class DubinsParameters:
     def __init__(self):
         self.p_s = np.inf * np.ones(3)  # the start position in re^3
         self.chi_s = np.inf  # the start course angle
@@ -33,8 +24,8 @@ class DubinParameters:
     def update(self, ps, chis, pe, chie, R):
         ell = np.linalg.norm(ps - pe)
         if ell < 2 * R:
-            print('Error in Dubins Parameters:\n' + \
-                  'The distance between nodes must be larger than 2R.\n' + \
+            print('Error in Dubins Parameters:\n' +
+                  'The distance between nodes must be larger than 2R.\n' +
                   'L: {}; 2R: {}'.format(ell, 2 * R))
         else:
             cxs = np.cos(chis)
@@ -127,7 +118,7 @@ class DubinParameters:
                 z1 = cs + R_Rz_n1
                 z2 = ce + R_Rz_n1
             else:
-                Exception("Bad dubins index")
+                raise Exception("Bad dubins index")
 
             self.p_s = ps
             self.chi_s = chis
@@ -144,18 +135,3 @@ class DubinParameters:
             self.r2 = z2
             self.r3 = z3
             self.n3 = q3
-
-
-def rotz(theta):
-    return np.array([[np.cos(theta), -np.sin(theta), 0],
-                     [np.sin(theta), np.cos(theta), 0],
-                     [0, 0, 1]])
-
-
-def mod(x):
-    # make x between 0 and 2*pi
-    while x < 0:
-        x += 2 * np.pi
-    while x > 2 * np.pi:
-        x -= 2 * np.pi
-    return x

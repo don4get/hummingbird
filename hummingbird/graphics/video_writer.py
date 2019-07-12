@@ -1,9 +1,3 @@
-"""
-mavsimPy: video making function
-    - Beard & McLain, PUP, 2012
-    - Update history:
-        1/10/2019 - RWB
-"""
 import numpy as np
 import cv2
 import pyscreenshot as ImageGrab

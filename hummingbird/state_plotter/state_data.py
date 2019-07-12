@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import numpy as np
 
+from hummingbird.tools.wrap import wrap_vector
+
 
 class StateData:
     def __init__(self, sigma_bounds=None, max_length=None, is_angle=False, rad2deg=False):
@@ -19,7 +21,7 @@ class StateData:
 
     def add_data(self, data, t, sigma=0):
         if self.is_angle:
-            data = angle_wrap(data)
+            data = wrap_vector(data)
         if self.rad2deg:
             data, sigma = np.degrees([data, sigma])
         self.data.append(data)
@@ -42,7 +44,7 @@ class StateData:
         if sigma is None:
             sigma = np.zeros_like(data)
         if self.is_angle:
-            data = angle_wrap(data)
+            data = wrap_vector(data)
         if self.rad2deg:
             data = np.degrees(data)
             sigma = np.degrees(sigma)
@@ -72,13 +74,3 @@ class StateData:
         self.time.pop(idx)
         for data in self.sigma_data.values():
             data.pop(idx)
-
-
-def angle_wrap(x):
-    xwrap = np.array(np.mod(x, 2 * np.pi))
-    mask = np.abs(xwrap) > np.pi
-    xwrap[mask] -= 2 * np.pi * np.sign(xwrap[mask])
-    if np.size(xwrap) == 1:
-        return float(xwrap)
-    else:
-        return xwrap
