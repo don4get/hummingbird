@@ -6,7 +6,7 @@ from hummingbird.physics.wind_simulation import WindSimulation
 from hummingbird.control.autopilot import Autopilot
 from hummingbird.physics.mav_dynamics import MavDynamics
 from hummingbird.estimation.observer import Observer
-from hummingbird.guidance.pathfollower import PathFollower
+from hummingbird.guidance.path_follower import PathFollower
 from hummingbird.guidance.path_manager \
     import PathManager
 from hummingbird.graphics.world_viewer import WorldViewer

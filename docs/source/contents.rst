@@ -3,18 +3,43 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to hummingbird's documentation!
-=======================================
+Welcome to hummingbird's docs
+=============================
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
+.. meta::
+   :description lang=en: Discover how to size and tuning your next fixed wing uav.
 
 
-Indices and tables
-==================
+`hummingbird`_ highlights how sizing and tuning of a fixedwing UAV has become
+thanks to recents publications on the subject. 
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+Many thanks to Pr. R. Beard and Pr. T. McLain, who published `Small UAV Theory and practice`_.
+
+**Learn how physics of the air described in equation**
+    Through out this documentation, you will learn why and 
+    how a small UAV is flying.
+
+**Run simple examples to get familiar with your favorite bird**
+    hummingbird comes with short scripts which can be run to analyse
+    fixedwing detailed behavior.
+
+**And many other features incoming**
+    RC piloting, hands on system identification, introduction to MIMO control, etc.
+
+.. _hummingbird: https://github.com/don4get/hummingbird
+.. _Small UAV Theory and practice: https://press.princeton.edu/titles/9632.html
+
+First steps
+-----------
+
+**Getting started**:
+    * Install recent python version: `download python`_
+    * :code:`git clone https://github.com/don4get/hummingbird.git`
+    * :code:`cd hummingbird`
+    * :code:`pip install virtualenv`
+    * :code:`virtualenv hummingbird-venv`
+    * :code:`source hummingbird-venv/bin/activate` on Mac OS / Linux, :code:`hummingbird\Scripts\activate` on Windows 
+    * :code:`pip install -r requirements.txt`
+    * :code:`python mavsim_chap12.py`
+
+.. _download python: https://www.python.org/downloads/
