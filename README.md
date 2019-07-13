@@ -17,7 +17,5 @@ I already completed the suggested template project in Matlab and in python (see 
 This new version will allow me to go further and test some features of OSS scientific libraries I am involved into 
 ([python-control](https://github.com/python-control/python-control), [sippy](https://github.com/CPCLAB-UNIPI/SIPPY)).
 
-### Setup
-* Install recent python 3.7
-* `pip install -r requirements.txt`
-* `python ./chap12/mavsim_chap12.py`
+## Do you want more info?
+Feel free to read the [wiki](https://github.com/don4get/hummingbird/wiki)
