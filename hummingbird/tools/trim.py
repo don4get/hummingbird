@@ -1,15 +1,6 @@
-"""
-compute_trim 
-    - Chapter 5 assignment for Beard & McLain, PUP, 2012
-    - Update history:  
-        2/5/2019 - RWB
-"""
-import sys
-
-sys.path.append('..')
 import numpy as np
 from scipy.optimize import minimize
-from hummingbird.tools import Euler2Quaternion
+from hummingbird.tools.rotations import Euler2Quaternion
 
 
 def compute_trim(mav, Va, gamma):

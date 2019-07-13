@@ -1,59 +1,60 @@
 import numpy as np
-from hummingbird import parameters as SIM
-
-from chap2.mav_viewer import mav_viewer
-from hummingbird.graphics import video_writer
-from chap3.data_viewer import data_viewer
-from chap4.mav_dynamics import mav_dynamics
-from chap4.wind_simulation import wind_simulation
+from hummingbird.parameters import simulation_parameters as sim_p
+from hummingbird.graphics.mav_viewer import MavViewer
+from hummingbird.graphics.video_writer import VideoWriter
+from hummingbird.graphics.data_viewer import DataViewer
+from hummingbird.physics.mav_dynamics import MavDynamics
+from hummingbird.physics.wind_simulation import WindSimulation
 
 # initialize the visualization
-VIDEO = False  # True==write video, False==don't write video
-DATA = True
-mav_view = mav_viewer()  # initialize the mav viewer
-if DATA:
-    data_view = data_viewer()  # initialize view of data plots
-if VIDEO == True:
-    video = video_writer(video_name="chap4_video.avi",
-                         bounding_box=(0, 0, 1000, 1000),
-                         output_rate=SIM.ts_video)
+enable_video = False
+enable_data = True
+
+mav_view = MavViewer()  # initialize the mav viewer
+
+if enable_data:
+    data_view = DataViewer()  # initialize view of data plots
+if enable_video:
+    video = VideoWriter(video_name="chap4_video.avi",
+                        bounding_box=(0, 0, 1000, 1000),
+                        output_rate=sim_p.ts_video)
 
 # initialize elements of the architecture
-wind = wind_simulation(SIM.ts_simulation)
-mav = mav_dynamics(SIM.ts_simulation)
+wind = WindSimulation(sim_p.ts_simulation)
+mav = MavDynamics(sim_p.ts_simulation)
 Va = 0
 
 # initialize the simulation time
-sim_time = SIM.start_time
+sim_time = sim_p.start_time
 
 # main simulation loop
 print("Press Command-Q to exit...")
-while sim_time < SIM.end_time:
+while sim_time < sim_p.end_time:
     # -------set control surfaces-------------
-    delta_e = -0.097
-    delta_t = 0.99
-    delta_a = 0.03
-    delta_r = -0.002
+    delta_e = -0.1
+    delta_a = 0.
+    delta_r = 0.
+    delta_t = 0.6
 
-    delta = np.array([delta_e, delta_t, delta_a, delta_r])
+    delta = np.array([delta_e, delta_a, delta_r, delta_t])
 
     # -------physical system-------------
     Va = mav._Va  # grab updated Va from MAV dynamics
     current_wind = wind.update(Va)  # get the new wind vector
-    mav.update_state(delta, current_wind)  # propagate the MAV dynamics
+    mav.update(delta, current_wind)  # propagate the MAV dynamics
 
     # -------update viewer-------------
     mav_view.update(mav.true_state)  # plot body of MAV
-    if DATA:
+    if enable_data:
         data_view.update(mav.true_state,  # true states
                          mav.true_state,  # estimated states
                          mav.true_state,  # commanded states
-                         SIM.ts_simulation)
-    if VIDEO == True:
+                         sim_p.ts_simulation)
+    if enable_video:
         video.update(sim_time)
 
     # -------increment time-------------
-    sim_time += SIM.ts_simulation
+    sim_time += sim_p.ts_simulation
 
-if VIDEO == True:
+if enable_video:
     video.close()

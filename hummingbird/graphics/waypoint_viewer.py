@@ -2,7 +2,7 @@ import numpy as np
 import pyqtgraph as pg
 import pyqtgraph.opengl as gl
 from hummingbird.tools.rotations import Euler2Rotation
-from hummingbird.guidance import dubin_parameters
+from hummingbird.guidance.dubin_parameters import DubinsParameters
 from hummingbird.tools.wrap import mod
 from hummingbird.tools.points_transformations import rotate_points, translate_points, get_mav_points, points_to_mesh, orbit_points, \
     straight_waypoint_points
@@ -27,7 +27,7 @@ class WaypointViewer:
         self.plot_initialized = False  # has the mav been plotted yet?
         # get points that define the non-rotated, non-translated mav and the mesh colors
         self.mav_points, self.mav_meshColors = get_mav_points()
-        self.dubins_path = dubin_parameters()
+        self.dubins_path = DubinsParameters()
         self.mav_body = []
 
     ###################################

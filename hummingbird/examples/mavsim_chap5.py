@@ -1,22 +1,22 @@
 import numpy as np
-from hummingbird import parameters as SIM
+from hummingbird.parameters import simulation_parameters as sim_p
+from hummingbird.graphics.mav_viewer import MavViewer
+from hummingbird.graphics.data_viewer import DataViewer
+from hummingbird.physics.mav_dynamics import MavDynamics
+from hummingbird.physics.wind_simulation import WindSimulation
+from hummingbird.tools.trim import compute_trim
+from hummingbird.tools.compute_models import compute_tf_model
 
-from chap2.mav_viewer import mav_viewer
-from chap3.data_viewer import data_viewer
-from chap4.mav_dynamics import mav_dynamics
-from chap4.wind_simulation import wind_simulation
-from chap5.trim import compute_trim
-from chap5.compute_models import compute_tf_model
+enable_data = False
 
 # initialize the visualization
-mav_view = mav_viewer()  # initialize the mav viewer
-DATA = False
-if DATA:
-    data_view = data_viewer()  # initialize view of data plots
+mav_view = MavViewer()  # initialize the mav viewer
+if enable_data:
+    data_view = DataViewer()  # initialize view of data plots
 
 # initialize elements of the architecture
-wind = wind_simulation(SIM.ts_simulation)
-mav = mav_dynamics(SIM.ts_simulation)
+wind = WindSimulation(sim_p.ts_simulation)
+mav = MavDynamics(sim_p.ts_simulation)
 
 # use compute_trim function to compute trim state and trim input
 Va = 25.
@@ -34,26 +34,24 @@ T_h_Va, T_Va_delta_t, T_Va_theta, T_beta_delta_r \
     = compute_tf_model(mav, trim_state, trim_input)
 
 # initialize the simulation time
-sim_time = SIM.start_time
+sim_time = sim_p.start_time
 
 # main simulation loop
 print("Press Command-Q to exit...")
-while sim_time < SIM.end_time:
+while sim_time < sim_p.end_time:
 
     # -------physical system-------------
     # current_wind = wind.update()  # get the new wind vector
     current_wind = np.zeros(6)
-    mav.update_state(delta, current_wind)  # propagate the MAV dynamics
+    mav.update(delta, current_wind)  # propagate the MAV dynamics
 
     # -------update viewer-------------
     mav_view.update(mav.true_state)  # plot body of MAV
-    if DATA:
+    if enable_data:
         data_view.update(mav.true_state,  # true states
                          mav.true_state,  # estimated states
                          mav.true_state,  # commanded states
-                         SIM.ts_simulation)
+                         sim_p.ts_simulation)
 
     # -------increment time-------------
-    sim_time += SIM.ts_simulation
-
-print
+    sim_time += sim_p.ts_simulation

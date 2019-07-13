@@ -1,39 +1,39 @@
 import numpy as np
-from hummingbird import parameters as SIM, parameters as PLAN
+from hummingbird.parameters import simulation_parameters as sim_p, planner_parameters as plan_p
+from hummingbird.graphics.data_viewer import DataViewer
+from hummingbird.graphics.waypoint_viewer import WaypointViewer
+from hummingbird.physics.wind_simulation import WindSimulation
+from hummingbird.physics.mav_dynamics import MavDynamics
+from hummingbird.control.autopilot import Autopilot
+from hummingbird.estimation.observer import Observer
+from hummingbird.guidance.path_follower import PathFollower
+from hummingbird.guidance.path_manager import PathManager
+from hummingbird.message_types.msg_waypoints import MsgWaypoints
 
-from chap3.data_viewer import data_viewer
-from chap4.wind_simulation import wind_simulation
-from chap6.autopilot import autopilot
-from chap8.mav_dynamics import mav_dynamics
-from chap8.observer import observer
-from chap10.path_follower import path_follower
-from chap11.path_manager import path_manager
-from chap11.waypoint_viewer import waypoint_viewer
+enable_data = True
 
 # initialize the visualization
-waypoint_view = waypoint_viewer()  # initialize the viewer
-DATA = True
-if DATA:
+waypoint_view = WaypointViewer()  # initialize the viewer
+if enable_data:
     screen_pos = [2000, 0]  # x, y position on screen
-    data_view = data_viewer(*screen_pos)  # initialize view of data plots
+    data_view = DataViewer(*screen_pos)  # initialize view of data plots
 
 # initialize elements of the architecture
-wind = wind_simulation(SIM.ts_simulation)
-mav = mav_dynamics(SIM.ts_simulation)
-ctrl = autopilot(SIM.ts_simulation)
-obsv = observer(SIM.ts_simulation)
-path_follow = path_follower()
-path_manage = path_manager()
+wind = WindSimulation(sim_p.ts_simulation)
+mav = MavDynamics(sim_p.ts_simulation)
+ctrl = Autopilot(sim_p.ts_simulation)
+obsv = Observer(sim_p.ts_simulation)
+path_follow = PathFollower()
+path_manage = PathManager()
 
 # waypoint definition
-from hummingbird.message_types import msg_waypoints
 
-waypoints = msg_waypoints()
+waypoints = MsgWaypoints()
 # waypoints.type = 'straight_line'
 waypoints.type = 'fillet'
 waypoints.type = 'dubins'
 waypoints.num_waypoints = 4
-Va = PLAN.Va0
+Va = plan_p.Va0
 waypoints.ned[:waypoints.num_waypoints] = np.array([[0, 0, -100],
                                                     [1000, 0, -100],
                                                     [0, 1000, -100],
@@ -45,20 +45,20 @@ waypoints.course[:waypoints.num_waypoints] = np.array([np.radians(0),
                                                        np.radians(-135)])
 
 # initialize the simulation time
-sim_time = SIM.start_time
+sim_time = sim_p.start_time
 
 delta = np.zeros(4)
 mav.update(delta)  # propagate the MAV dynamics
 mav.update_sensors()
 # main simulation loop
 print("Press Q to exit...")
-while sim_time < SIM.end_time:
+while sim_time < sim_p.end_time:
     # -------observer-------------
     measurements = mav.update_sensors()  # get sensor measurements
     estimated_state = obsv.update(measurements)  # estimate states from measurements
 
     # -------path manager-------------
-    path = path_manage.update(waypoints, PLAN.R_min, estimated_state)
+    path = path_manage.update(waypoints, plan_p.R_min, estimated_state)
 
     # -------path follower-------------
     # autopilot_commands = path_follow.update(path, estimated_state)
@@ -79,11 +79,11 @@ while sim_time < SIM.end_time:
     else:
         waypoint_view.update(waypoints, path, mav.true_state)  # plot path and MAV
 
-    if DATA:
+    if enable_data:
         data_view.update(mav.true_state,  # true states
                          estimated_state,  # estimated states
                          commanded_state,  # commanded states
-                         SIM.ts_simulation)
+                         sim_p.ts_simulation)
 
     # -------increment time-------------
-    sim_time += SIM.ts_simulation
+    sim_time += sim_p.ts_simulation

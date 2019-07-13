@@ -7,14 +7,14 @@ from hummingbird.message_types.msg_state import MsgState
 from hummingbird.graphics.video_writer import VideoWriter
 
 
-
-# initialize viewers and video
 enable_video = True  # True==write video, False==don't write video
 end_time = 50.
+
 mav_view = MavViewer()
 data_view = DataViewer()
 mav = MavDynamics(sim_p.ts_simulation)
 cmd_state = MsgState()
+
 if enable_video:
     video = VideoWriter(video_name="chap3_video.avi",
                         bounding_box=(0, 0, 1000, 1000),
@@ -27,11 +27,11 @@ for i in range(6):
     sim_time = sim_p.start_time
     forces_moments = np.zeros(6)  # fx, fy, fz, l, m, n
     if i < 3:
-        val = 100
+        val = 100  # [N]
         print('***** APPLYING FORCE {} OF {} N *****'.format(FM_list[i], val))
     else:
-        val = 0.05
-        print('***** APPLYING MOMENT {} OF {} N-m *****'.format(FM_list[i], val))
+        val = 0.05  # [Nm]
+        print('***** APPLYING MOMENT {} OF {} Nm *****'.format(FM_list[i], val))
     forces_moments[i] = val
     mav.reset_state()
     while sim_time < end_time:

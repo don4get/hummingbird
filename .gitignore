@@ -3,6 +3,7 @@
 *__pycache__
 *.swp
 *.avi
+*.pkl
 
 venv/
 .idea/

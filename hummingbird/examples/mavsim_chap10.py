@@ -1,33 +1,33 @@
 import numpy as np
-from hummingbird import parameters as SIM
+from hummingbird.parameters import simulation_parameters as sim_p
+from hummingbird.graphics.data_viewer import DataViewer
+from hummingbird.graphics.path_viewer import PathViewer
+from hummingbird.physics.wind_simulation import WindSimulation
+from hummingbird.physics.mav_dynamics import MavDynamics
+from hummingbird.control.autopilot import Autopilot
+from hummingbird.estimation.observer import Observer
+from hummingbird.guidance.path_follower import PathFollower
+from hummingbird.message_types.msg_path import MsgPath
 
-from chap3.data_viewer import data_viewer
-from chap4.wind_simulation import wind_simulation
-from chap6.autopilot import autopilot
-from chap8.mav_dynamics import mav_dynamics
-from chap8.observer import observer
-from chap10.path_follower import path_follower
-from chap10.path_viewer import path_viewer
+enable_data = True
 
 # initialize the visualization
-path_view = path_viewer()  # initialize the viewer
-DATA = True
-if DATA:
+path_view = PathViewer()  # initialize the viewer
+if enable_data:
     pos = [1100, 0]  # x, y position on screen
-    data_view = data_viewer(*pos)  # initialize view of data plots
+    data_view = DataViewer(*pos)  # initialize view of data plots
 
 # initialize elements of the architecture
-wind = wind_simulation(SIM.ts_simulation)
-mav = mav_dynamics(SIM.ts_simulation)
-ctrl = autopilot(SIM.ts_simulation)
-obsv = observer(SIM.ts_simulation)
-path_follow = path_follower()
+wind = WindSimulation(sim_p.ts_simulation)
+mav = MavDynamics(sim_p.ts_simulation)
+ctrl = Autopilot(sim_p.ts_simulation)
+obsv = Observer(sim_p.ts_simulation)
+path_follow = PathFollower()
 measurements = mav.sensors
 
 # path definition
-from hummingbird.message_types import msg_path
 
-path = msg_path()
+path = MsgPath()
 # path.type = 'line'
 path.type = 'orbit'
 if path.type == 'line':
@@ -40,11 +40,11 @@ else:  # path.type == 'orbit'
     path.orbit_direction = 'CW'  # orbit direction: 'CW'==clockwise, 'CCW'==counter clockwise
 
 # initialize the simulation time
-sim_time = SIM.start_time
+sim_time = sim_p.start_time
 
 # main simulation loop
 print("Press Command-Q to exit...")
-while sim_time < SIM.end_time:
+while sim_time < sim_p.end_time:
     # -------observer-------------
     measurements = mav.update_sensors()  # get sensor measurements
     estimated_state = obsv.update(measurements)  # estimate states from measurements
@@ -62,11 +62,11 @@ while sim_time < SIM.end_time:
 
     # -------update viewer-------------
     path_view.update(path, mav.true_state)  # plot path and MAV
-    if DATA:
+    if enable_data:
         data_view.update(mav.true_state,  # true states
                          estimated_state,  # estimated states
                          commanded_state,  # commanded states
-                         SIM.ts_simulation)
+                         sim_p.ts_simulation)
 
     # -------increment time-------------
-    sim_time += SIM.ts_simulation
+    sim_time += sim_p.ts_simulation
