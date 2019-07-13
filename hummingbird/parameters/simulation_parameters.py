@@ -8,4 +8,5 @@ end_time = 50000.  # end time for simulation
 
 ts_plotting = 0.3  # refresh rate for plots
 
-ts_control = ts_simulation  # sample rate for the controller
+ts_controller = ts_simulation  # sample rate for the controller
+ts_observer = ts_simulation  # sample rate for the observer

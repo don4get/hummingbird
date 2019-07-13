@@ -11,26 +11,26 @@ from hummingbird.guidance.path_manager \
     import PathManager
 from hummingbird.graphics.world_viewer import WorldViewer
 from hummingbird.guidance.path_planner import PathPlanner
+from hummingbird.message_types.msg_map import MsgMap
+
+enable_data = True
 
 # initialize the visualization
 world_view = WorldViewer()  # initialize the viewer
-DATA = True
-if DATA:
+if enable_data:
     screen_pos = [2000, 0]  # x, y position on screen
     data_view = DataViewer(*screen_pos)  # initialize view of data plots
 
 # initialize elements of the architecture
 wind = WindSimulation(sim.ts_simulation)
 mav = MavDynamics(sim.ts_simulation)
-ctrl = Autopilot(sim.ts_simulation)
-obsv = Observer(sim.ts_simulation)
+ctrl = Autopilot(sim.ts_controller)
+obsv = Observer(sim.ts_observer)
 path_follow = PathFollower()
 path_manage = PathManager()
 path_plan = PathPlanner()
 
-from hummingbird.message_types.msg_map import MsgMap
-
-map = MsgMap(plan)
+msg_map = MsgMap(plan)
 
 # initialize the simulation time
 sim_time = sim.start_time
@@ -47,7 +47,7 @@ while sim_time < sim.end_time:
 
     # -------path planner - ----
     if path_manage.flag_need_new_waypoints == 1:
-        waypoints = path_plan.update(map, estimated_state)
+        waypoints = path_plan.update(msg_map, estimated_state)
 
     # -------path manager-------------
     path = path_manage.update(waypoints, plan.R_min, estimated_state)
@@ -63,8 +63,8 @@ while sim_time < sim.end_time:
     mav.update(delta, current_wind)  # propagate the MAV dynamics
 
     # -------update viewer-------------
-    world_view.update(map, waypoints, path, mav.true_state)  # plot path and MAV
-    if DATA:
+    world_view.update(msg_map, waypoints, path, mav.true_state)  # plot path and MAV
+    if enable_data:
         data_view.update(mav.true_state,  # true states
                          estimated_state,  # estimated states
                          commanded_state,  # commanded states

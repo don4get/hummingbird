@@ -1,6 +1,5 @@
 import numpy as np
 from hummingbird.parameters import simulation_parameters as sim_p
-
 from hummingbird.graphics.mav_viewer import MavViewer
 from hummingbird.graphics.data_viewer import DataViewer
 from hummingbird.physics.mav_dynamics import MavDynamics
@@ -20,7 +19,7 @@ if enable_data:
 # initialize elements of the architecture
 wind = WindSimulation(sim_p.ts_simulation)
 mav = MavDynamics(sim_p.ts_simulation)
-ctrl = Autopilot(sim_p.ts_simulation)
+ctrl = Autopilot(sim_p.ts_controller)
 
 # autopilot commands
 commands = MsgAutopilot()

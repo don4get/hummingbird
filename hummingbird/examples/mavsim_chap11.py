@@ -21,8 +21,8 @@ if enable_data:
 # initialize elements of the architecture
 wind = WindSimulation(sim_p.ts_simulation)
 mav = MavDynamics(sim_p.ts_simulation)
-ctrl = Autopilot(sim_p.ts_simulation)
-obsv = Observer(sim_p.ts_simulation)
+ctrl = Autopilot(sim_p.ts_controller)
+obsv = Observer(sim_p.ts_observer)
 path_follow = PathFollower()
 path_manage = PathManager()
 

@@ -12,7 +12,7 @@ class EkfPosition:
                               sensor_p.gps_Vg_sigma, sensor_p.gps_course_sigma]) ** 2
         self.R_pseudo = np.eye(2) * 0.01
         self.N = 25  # number of prediction step per sample
-        self.Ts = (sim_p.ts_control / self.N)
+        self.Ts = (sim_p.ts_controller / self.N)
         self.xhat = np.zeros(7)  # n, pe, Vg, chi, wn, we, psi
         self.xhat[2] = 25  # Vg
         self.P = np.eye(7) * 0.5

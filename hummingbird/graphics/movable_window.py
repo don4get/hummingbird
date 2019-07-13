@@ -5,6 +5,7 @@ from pyqtgraph import GraphicsWindow
 
 class MovableWindow(GraphicsWindow):
     def __init__(self, *args, **kwargs):
+        print("Press Ctrl-Q to exit...")
         super().__init__(*args, **kwargs)
 
     def keyPressEvent(self, event):

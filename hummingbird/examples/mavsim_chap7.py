@@ -19,7 +19,7 @@ if enable_data:
 # initialize elements of the architecture
 wind = WindSimulation(sim_p.ts_simulation)
 mav = MavDynamics(sim_p.ts_simulation)
-ctrl = Autopilot(sim_p.ts_simulation)
+ctrl = Autopilot(sim_p.ts_controller)
 
 # autopilot commands
 commands = MsgAutopilot()

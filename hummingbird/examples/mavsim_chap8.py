@@ -22,7 +22,7 @@ if enable_data:
 wind = WindSimulation(sim_p.ts_simulation)
 mav = MavDynamics(sim_p.ts_simulation)
 ctrl = Autopilot(sim_p.ts_simulation)
-obsv = Observer(sim_p.ts_simulation)
+obsv = Observer(sim_p.ts_controller)
 measurements = mav.sensors
 
 # autopilot commands

@@ -13,7 +13,7 @@ class EkfAttitude:
         self.N = 10  # number of prediction step per sample
         self.xhat = np.zeros(2)  # initial state: phi, theta
         self.P = np.eye(2) * 0.1
-        self.Ts = sim_p.ts_control / self.N
+        self.Ts = sim_p.ts_controller / self.N
 
     def update(self, state, measurement):
         self.propagate_model(state)
