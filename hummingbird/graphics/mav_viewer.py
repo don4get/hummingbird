@@ -12,10 +12,10 @@ class MavViewer:
         self.app = pg.QtGui.QApplication([])  # initialize QT
         self.window = gl.GLViewWidget()  # initialize the view object
         self.window.setWindowTitle('MAV Viewer')
-        self.window.setGeometry(0, 0, 750, 750)  # args: upper_left_x, upper_right_y, width, height
-        grid = gl.GLGridItem() # make a grid to represent the ground
-        grid.scale(100, 100, 100) # set the size of the grid (distance between each line)
-        self.window.addItem(grid) # add grid to viewer
+        self.window.setGeometry(0, 0, 800, 600)  # args: upper_left_x, upper_right_y, width, height
+        grid = gl.GLGridItem()  # make a grid to represent the ground
+        grid.scale(100, 100, 100)  # set the size of the grid (distance between each line)
+        self.window.addItem(grid)  # add grid to viewer
         self.window.setCameraPosition(distance=400) # distance from center of plot to camera
         self.window.setBackgroundColor('k')  # set background color to black
         self.window.show()  # display configured window

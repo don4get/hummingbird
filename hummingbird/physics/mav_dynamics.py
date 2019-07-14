@@ -9,6 +9,31 @@ from math import asin, exp, acos
 np.set_printoptions(suppress=True, precision=4)
 
 
+def prop_thrust_torque(dt, Va):
+    # propeller thrust and torque
+    rho = mav_p.rho
+    D = mav_p.D_prop
+
+    V_in = mav_p.V_max * dt
+    a = rho * D ** 5 * mav_p.C_Q0 / (2 * np.pi) ** 2
+    b = rho * D ** 4 * mav_p.C_Q1 * Va / (2 * np.pi) + mav_p.KQ ** 2 / mav_p.R_motor
+    c = rho * D ** 3 * mav_p.C_Q2 * Va ** 2 - \
+        (mav_p.KQ * V_in) / mav_p.R_motor + mav_p.KQ * mav_p.i0
+    radicand = b ** 2 - 4 * a * c
+    if radicand < 0:
+        radicand = 0
+    Omega_op = (-b + np.sqrt(radicand)) / (2 * a)
+
+    J_op = 2 * np.pi * Va / (Omega_op * D)
+    C_T = mav_p.C_T2 * J_op ** 2 + mav_p.C_T1 * J_op + mav_p.C_T0
+    C_Q = mav_p.C_Q2 * J_op ** 2 + mav_p.C_Q1 * J_op + mav_p.C_Q0
+    n = Omega_op / (2 * np.pi)
+    fp_x = rho * n ** 2 * D ** 4 * C_T
+    Mp_x = rho * n ** 2 * D ** 5 * C_Q
+
+    return fp_x, Mp_x
+
+
 class MavDynamics:
     def __init__(self, ts):
         self._ts_simulation = ts
@@ -228,7 +253,7 @@ class MavDynamics:
         # gravity
         fg = self.R_bv @ np.array([0, 0, mav_p.mass * mav_p.gravity])
 
-        thrust, torque = self._prop_thrust_torque(dt, self._Va)
+        thrust, torque = prop_thrust_torque(dt, self._Va)
         fp = np.array([thrust, 0, 0])
         Mp = np.array([torque, 0, 0])
 
@@ -294,31 +319,6 @@ class MavDynamics:
         self._forces[1] = fy
         self._forces[2] = fz
         return np.array([fx, fy, fz, Mx, My, Mz])
-
-    def _prop_thrust_torque(self, dt, Va):
-        # propeller thrust and torque
-        rho = mav_p.rho
-        D = mav_p.D_prop
-        Va = self._Va
-
-        V_in = mav_p.V_max * dt
-        a = rho * D ** 5 * mav_p.C_Q0 / (2 * np.pi) ** 2
-        b = rho * D ** 4 * mav_p.C_Q1 * Va / (2 * np.pi) + mav_p.KQ ** 2 / mav_p.R_motor
-        c = rho * D ** 3 * mav_p.C_Q2 * Va ** 2 - \
-            (mav_p.KQ * V_in) / mav_p.R_motor + mav_p.KQ * mav_p.i0
-        radicand = b ** 2 - 4 * a * c
-        if radicand < 0:
-            radicand = 0
-        Omega_op = (-b + np.sqrt(radicand)) / (2 * a)
-
-        J_op = 2 * np.pi * Va / (Omega_op * D)
-        C_T = mav_p.C_T2 * J_op ** 2 + mav_p.C_T1 * J_op + mav_p.C_T0
-        C_Q = mav_p.C_Q2 * J_op ** 2 + mav_p.C_Q1 * J_op + mav_p.C_Q0
-        n = Omega_op / (2 * np.pi)
-        fp_x = rho * n ** 2 * D ** 4 * C_T
-        Mp_x = rho * n ** 2 * D ** 5 * C_Q
-
-        return fp_x, Mp_x
 
     def calc_gamma_chi(self):
         Vg = self.R_vb @ self._state[3:6]

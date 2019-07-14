@@ -5,22 +5,25 @@ from hummingbird.graphics.video_writer import VideoWriter
 
 
 class KinematicsSimulator(Simulator):
-    def __init__(self):
-        Simulator.__init__(self)
-        self.msg_state = MsgState()  # instantiate state message
-        self.mav_viewer = MavViewer()
+    def __init__(self, record_video=False, config="translation"):
+        Simulator.__init__(self, record_video)
         if self.record_video:
-            self.video = VideoWriter(video_name="vid.avi",
+            self.video = VideoWriter(video_name="kinematics.avi",
                                      bounding_box=(0, 0, 1000, 1000),
                                      output_rate=self.sim_p.ts_video)
+        self.msg_state = MsgState()
+        self.mav_viewer = MavViewer()
+        self.config = config
 
     def simulate(self):
         print("Press Ctrl-Q to exit...")
         while self.sim_time < self.sim_p.end_time:
             # -------vary states to check viewer-------------
 
-            self.trans_rot(self.sim_time)
-            # rot_trans(sim_time)
+            if self.config == "translation":
+                self.trans_rot(self.sim_time)
+            elif self.config == "rotation":
+                self.rot_trans(self.sim_time)
 
             # -------update viewer and video-------------
             self.mav_viewer.update(self.msg_state)

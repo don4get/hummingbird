@@ -15,7 +15,7 @@ enable_data = True
 # initialize the visualization
 waypoint_view = WaypointViewer()  # initialize the viewer
 if enable_data:
-    screen_pos = [2000, 0]  # x, y position on screen
+    screen_pos = [0, 0]  # x, y position on screen
     data_view = DataViewer(*screen_pos)  # initialize view of data plots
 
 # initialize elements of the architecture

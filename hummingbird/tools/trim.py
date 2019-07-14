@@ -52,8 +52,9 @@ def compute_trim(mav, Va, gamma):
 
     # solve the minimization problem to find the trim states and inputs
     res = minimize(trim_objective, x0, method='SLSQP', args=(mav, Va, gamma),
-                   constraints=cons, options={'ftol': 1e-10, 'disp': True})
+                   constraints=cons, options={'ftol': 1e-10, 'disp': True, 'xtol': 1e-7})
     # extract trim state and input and return
+    print(res)
     trim_state = np.array(res.x[0:13])
     trim_input = np.array(res.x[13:17])
 

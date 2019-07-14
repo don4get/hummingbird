@@ -24,7 +24,8 @@ gamma = 0. * np.pi / 180.
 trim_state, trim_input = compute_trim(mav, Va, gamma)
 mav._state = trim_state  # set the initial state of the mav to the trim state
 delta = np.copy(trim_input)  # set input to constant constant trim input
-# print('trim_input:', trim_input)
+print('trim_input:', trim_input)
+print('trim_state:', trim_state)
 # delta[-1] = 1.0
 
 # # compute the state space model linearized about trim
@@ -42,8 +43,10 @@ while sim_time < sim_p.end_time:
 
     # -------physical system-------------
     # current_wind = wind.update()  # get the new wind vector
-    current_wind = np.zeros(6)
-    mav.update(delta, current_wind)  # propagate the MAV dynamics
+    forces_moments = mav._forces_moments(delta)
+    mav._update_velocity_data(np.zeros(6))
+    print("Forces and moments: {}".format(forces_moments))
+    mav.update_true_state_from_forces_moments(forces_moments)
 
     # -------update viewer-------------
     mav_view.update(mav.true_state)  # plot body of MAV

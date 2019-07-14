@@ -14,7 +14,7 @@ enable_data = True
 # initialize the visualization
 path_view = PathViewer()  # initialize the viewer
 if enable_data:
-    pos = [1100, 0]  # x, y position on screen
+    pos = [0, 0]  # x, y position on screen
     data_view = DataViewer(*pos)  # initialize view of data plots
 
 # initialize elements of the architecture

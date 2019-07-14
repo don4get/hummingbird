@@ -11,13 +11,13 @@ enable_video = True  # True==write video, False==don't write video
 end_time = 50.
 
 mav_view = MavViewer()
-data_view = DataViewer()
+data_view = DataViewer(800, 0)
 mav = MavDynamics(sim_p.ts_simulation)
 cmd_state = MsgState()
 
 if enable_video:
     video = VideoWriter(video_name="chap3_video.avi",
-                        bounding_box=(0, 0, 1000, 1000),
+                        bounding_box=(0, 0, 800, 600),
                         output_rate=sim_p.ts_video)
 
 FM_list = ['fx', 'fy', 'fz', 'l', 'm', 'n']
