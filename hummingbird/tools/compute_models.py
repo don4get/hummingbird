@@ -2,6 +2,7 @@ import numpy as np
 from hummingbird.tools.rotations import Quaternion2Euler
 from control import TransferFunction as TF
 from hummingbird.parameters import aerosonde_parameters as mav_p
+from hummingbird.physics.generics import propeller_thrust_torque
 import pickle as pkl
 
 
@@ -60,8 +61,8 @@ def compute_tf_model(mav, trim_state, trim_input):
 def dT_dVa(mav, Va, delta_t):
     # returns the derivative of motor thrust with respect to Va
     epsilon = 0.01
-    fp1, _ = mav._prop_thrust_torque(delta_t, Va - epsilon)
-    fp2, _ = mav._prop_thrust_torque(delta_t, Va + epsilon)
+    fp1, _ = propeller_thrust_torque(delta_t, Va - epsilon, mav_p)
+    fp2, _ = propeller_thrust_torque(delta_t, Va + epsilon, mav_p)
 
     dThrust = (fp2 - fp1) / (2 * epsilon)
     return dThrust
@@ -70,8 +71,8 @@ def dT_dVa(mav, Va, delta_t):
 def dT_ddelta_t(mav, Va, delta_t):
     # returns the derivative of motor thrust with respect to delta_t
     epsilon = 0.001
-    fp1, _ = mav._prop_thrust_torque(delta_t - epsilon, Va)
-    fp2, _ = mav._prop_thrust_torque(delta_t + epsilon, Va)
+    fp1, _ = propeller_thrust_torque(delta_t - epsilon, Va, mav_p)
+    fp2, _ = propeller_thrust_torque(delta_t + epsilon, Va, mav_p)
 
     dThrust = (fp2 - fp1) / (2 * epsilon)
     return dThrust

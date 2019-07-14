@@ -3,7 +3,7 @@ from hummingbird.parameters import aerosonde_parameters as mav_p
 from hummingbird.message_types.msg_state import MsgState
 from hummingbird.estimation.ekf_attitude import EkfAttitude
 from hummingbird.estimation.ekf_position import EkfPosition
-from hummingbird.tools.alpha_filter import AlphaFilter
+from hummingbird.maths.filters.alpha_filter import AlphaFilter
 
 
 class Observer:

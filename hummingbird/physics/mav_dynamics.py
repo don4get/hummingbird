@@ -3,35 +3,11 @@ from hummingbird.message_types.msg_state import MsgState
 from hummingbird.message_types.msg_sensors import MsgSensors
 from hummingbird.parameters import aerosonde_parameters as mav_p
 import hummingbird.parameters.sensor_parameters as sensor_p
+from hummingbird.physics.generics import propeller_thrust_torque
 from hummingbird.tools.rotations import Quaternion2Rotation, Quaternion2Euler
 from math import asin, exp, acos
 
 np.set_printoptions(suppress=True, precision=4)
-
-
-def prop_thrust_torque(dt, Va):
-    # propeller thrust and torque
-    rho = mav_p.rho
-    D = mav_p.D_prop
-
-    V_in = mav_p.V_max * dt
-    a = rho * D ** 5 * mav_p.C_Q0 / (2 * np.pi) ** 2
-    b = rho * D ** 4 * mav_p.C_Q1 * Va / (2 * np.pi) + mav_p.KQ ** 2 / mav_p.R_motor
-    c = rho * D ** 3 * mav_p.C_Q2 * Va ** 2 - \
-        (mav_p.KQ * V_in) / mav_p.R_motor + mav_p.KQ * mav_p.i0
-    radicand = b ** 2 - 4 * a * c
-    if radicand < 0:
-        radicand = 0
-    Omega_op = (-b + np.sqrt(radicand)) / (2 * a)
-
-    J_op = 2 * np.pi * Va / (Omega_op * D)
-    C_T = mav_p.C_T2 * J_op ** 2 + mav_p.C_T1 * J_op + mav_p.C_T0
-    C_Q = mav_p.C_Q2 * J_op ** 2 + mav_p.C_Q1 * J_op + mav_p.C_Q0
-    n = Omega_op / (2 * np.pi)
-    fp_x = rho * n ** 2 * D ** 4 * C_T
-    Mp_x = rho * n ** 2 * D ** 5 * C_Q
-
-    return fp_x, Mp_x
 
 
 class MavDynamics:
@@ -253,7 +229,7 @@ class MavDynamics:
         # gravity
         fg = self.R_bv @ np.array([0, 0, mav_p.mass * mav_p.gravity])
 
-        thrust, torque = prop_thrust_torque(dt, self._Va)
+        thrust, torque = propeller_thrust_torque(dt, self._Va, mav_p)
         fp = np.array([thrust, 0, 0])
         Mp = np.array([torque, 0, 0])
 
@@ -297,12 +273,12 @@ class MavDynamics:
 
         # Calculating l
         l = 1 / 2.0 * rho * (Va ** 2) * S * b * (mav_p.C_ell_0 + mav_p.C_ell_beta * beta +
-                                                 mav_p.C_ell_p * (b / (2 * Va)) * p + mav_p.C_ell_r * (b / (2 * Va)) * \
+                                                 mav_p.C_ell_p * (b / (2 * Va)) * p + mav_p.C_ell_r * (b / (2 * Va)) *
                                                  r + mav_p.C_ell_delta_a * da + mav_p.C_ell_delta_r * dr)
 
         # Calculating n
         n = 1 / 2.0 * rho * (Va ** 2) * S * b * (mav_p.C_n_0 + mav_p.C_n_beta * beta +
-                                                 mav_p.C_n_p * (b / (2 * Va)) * p + mav_p.C_n_r * (b / (2 * Va)) * r + \
+                                                 mav_p.C_n_p * (b / (2 * Va)) * p + mav_p.C_n_r * (b / (2 * Va)) * r +
                                                  mav_p.C_n_delta_a * da + mav_p.C_n_delta_r * dr)
 
         # Combining into force/moment arrays
@@ -314,7 +290,7 @@ class MavDynamics:
 
         # Summing forces and moments
         [fx, fy, fz] = fg + fa + fp
-        [Mx, My, Mz] = Ma - Mp
+        [Mx, My, Mz] = Ma + Mp
         self._forces[0] = fx
         self._forces[1] = fy
         self._forces[2] = fz
