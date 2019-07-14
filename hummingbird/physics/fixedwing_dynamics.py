@@ -3,9 +3,22 @@ from functools import partial
 from hummingbird.parameters.constants import ActuatorEnum, PhysicalConstants as pc, StateEnum
 from hummingbird.physics.dynamics_base import *
 from hummingbird.maths.generics import compute_sigmoid
-from hummingbird.physics.kinematics import compute_kinematics
+from hummingbird.physics.kinematics import compute_kinematics, compute_kinematics_from_quat
+from hummingbird.physics.generics import *
 from hummingbird.maths.gradient_descent import gradient_descent
+
+
 import numpy as np
+from hummingbird.message_types.msg_state import MsgState
+from hummingbird.parameters.aerosonde_parameters import MavParameters
+from hummingbird.parameters import simulation_parameters as sim_p
+from hummingbird.physics.generics import propeller_thrust_torque
+from hummingbird.tools.rotations import Quaternion2Rotation, Quaternion2Euler
+from math import asin, exp, acos
+from hummingbird.parameters.constants import StateQuatEnum as SQE
+from hummingbird.maths.generics import normalize_vector
+
+np.set_printoptions(suppress=True, precision=4)
 
 
 class FixedwingDynamics(DynamicsBase):
@@ -19,168 +32,164 @@ class FixedwingDynamics(DynamicsBase):
         :type dt_integration: double [s]
     """
 
-    def __init__(self, x0, t0, dt_integration, params):
-        self.params = params
+    def __init__(self,
+                 x0=MavParameters().initial_state,
+                 t0=sim_p.start_time,
+                 dt_integration=sim_p.dt_simulation,
+                 mav_p=MavParameters):
+        self.mav_p = mav_p
         super(FixedwingDynamics, self).__init__(x0, t0, dt_integration)
         self.t0 = t0
         self.set_integrator(FixedwingDynamics.dynamics,
                             'dop853', jac=None, rtol=1e-8)
-        self.partial_forces_and_moments = partial(
-                FixedwingDynamics.forces_and_moments, params=self.params)
+        self.partial_forces_moments = partial(
+                FixedwingDynamics.forces_moments, params=self.mav_p)
         self._control_inputs = [0., 0., 0., 0.]
 
+        self._dt_simulation = dt_integration
+
+        self.R_vb = Quaternion2Rotation(self._state[6:10])  # Rotation body->vehicle
+        self.R_bv = np.copy(self.R_vb).T  # vehicle->body
+
+        self._forces = np.zeros(3)
+        self._wind = np.zeros(3)  # wind in NED frame in meters/
+
+        self._Va = self.mav_p.u0
+        self._alpha = 0
+        self._beta = 0
+        self.true_state = MsgState()
+
+    def reset_state(self):
+        self._state = np.array([self.mav_p.pn0,  # (0)
+                                self.mav_p.pe0,  # (1)
+                                self.mav_p.pd0,  # (2)
+                                self.mav_p.u0,  # (3)
+                                self.mav_p.v0,  # (4)
+                                self.mav_p.w0,  # (5)
+                                self.mav_p.e0,  # (6)
+                                self.mav_p.e1,  # (7)
+                                self.mav_p.e2,  # (8)
+                                self.mav_p.e3,  # (9)
+                                self.mav_p.p0,  # (10)
+                                self.mav_p.q0,  # (11)
+                                self.mav_p.r0])  # (12)
+
+    def update(self, delta, wind):
+        self.control_inputs = delta
+        self._wind = wind
+        if self.control_inputs is not None:
+            t = self._dt_simulation + self.integrator.t
+            self.integrate(t)
+        else:
+            raise Exception('set control inputs first')
+
+        self._forces = self.forces_moments(self._state, self.control_inputs, self.mav_p)[0:3]
+        self.R_vb = Quaternion2Rotation(self._state[6:10])  # Rotation body->vehicle
+        self.R_bv = np.copy(self.R_vb).T  # vehicle->body
+        self._update_true_state()
+
     @staticmethod
-    def forces_and_moments(y, control_inputs, params):
-        """ Compute the second law of newton, given the state and the
-        control inputs
-
-        :param y: State vector
-        :type y: vector [12x1]
-        :param control_inputs: actuators
-        :type control_inputs: vector [4x1]
-        :param params: [description]
-        :type params: [type]
-        :returns: [description]
-        :rtype: {[type]}
+    def forces_moments(x, delta, params):
         """
-        g = pc.g
-        mass = params.mass # ['params']['mass']
-        S = params.S
-        b = params.b
-        c = params.c
-        rho = params.rho
-        e = params.e
-        kT_p = params.kT_p
-        kOmega = params.kOmega
+        return the forces on the UAV based on the state, wind, and control surfaces
+        :param delta: np.matrix(delta_e, delta_a, delta_r, delta_t)
+        :return: Forces and Moments on the UAV np.matrix(Fx, Fy, Fz, Ml, Mn, Mm)
+        """
+        de = delta[0]
+        da = delta[1]
+        dr = delta[2]
+        dt = delta[3]
+        P = params
 
-        u = y[StateEnum.u]
-        v = y[StateEnum.v]
-        w = y[StateEnum.w]
-        phi = y[StateEnum.phi]
-        theta = y[StateEnum.theta]
-        p = y[StateEnum.p]
-        q = y[StateEnum.q]
-        r = y[StateEnum.r]
+        # Gravity
+        R_bv = Quaternion2Rotation(x[SQE.e0:SQE.e3+1]).T
+        fg = R_bv @ np.array([0, 0, P.mass * P.gravity])
 
-        Va = np.sqrt(u**2 + v**2 + w**2)
-
-        alpha, beta = FixedwingDynamics.compute_alpha_beta(Va, u, v, w)
-
-        delta_e = control_inputs[ActuatorEnum.elevator]
-        delta_a = control_inputs[ActuatorEnum.aileron]
-        delta_r = control_inputs[ActuatorEnum.rudder]
-        delta_t = control_inputs[ActuatorEnum.thrust]
-
+        # Air data
+        Va = np.linalg.norm(x[SQE.u:SQE.w+1])
+        alpha, beta = FixedwingDynamics.compute_alpha_beta(Va, x[SQE.u], x[SQE.v], x[SQE.w])
         # Dynamic pressure
-        p_dyn = compute_dynamic_pressure(rho, Va)
+        p_dyn = compute_dynamic_pressure(P.rho, Va)
 
-        def longitudinal_aerodynamic_forces_moments():
-            CL0 = params.CL0
-            CL_alpha = params.CL_alpha
-            CL_q = params.CL_q
-            CL_delta_e = params.CL_delta_e
-            M = params.M
-            alpha_0 = params.alpha_0
+        # Propeller
+        fp, Mp = propeller_thrust_torque(dt, Va, P)
 
-            sigmoid_alpha = compute_sigmoid(alpha_0, alpha, M)
-            nonlinear_CL_alpha = compute_nonlinear_CL_alpha(alpha, CL0, CL_alpha, sigmoid_alpha)
+        # Aerodynamic forces/moments
 
-            if np.isclose(Va, 0., 1e-5):
-                lift = 0.
-            else:
-                lift = p_dyn * S * (nonlinear_CL_alpha  + CL_q * c * q * 0.5 / Va + CL_delta_e * delta_e)
+        # Longitudinal
+        M = P.M
+        alpha = alpha
+        alpha0 = P.alpha0
+        Va = Va
+        q_S = p_dyn * P.S_wing
+        q = x[SQE.q]
+        c = P.c
 
-            CD0 = params.CD0
-            CD_alpha = params.CD_alpha
-            CD_q = params.CD_q
-            CD_delta_e = params.CD_delta_e
-            CD_p = params.CD_p
-            aspect_ratio = compute_aspect_ratio(b, S)
-            # TODO: Figure out why CD_p is used here
-            # CD_alpha = CD_p + (CL0 + CL_alpha * alpha)**2 / (np.pi * e * AR)
+        sigma_alpha = (1 + exp(-M * (alpha - alpha0)) + exp(M * (alpha + alpha0))) / \
+                      ((1 + exp(-M * (alpha - alpha0))) * (1 + exp(M * (alpha + alpha0))))
+        CL_alpha = (1 - sigma_alpha) * (P.C_L_0 + P.C_L_alpha * alpha) + \
+                   sigma_alpha * (2 * np.sign(alpha) * (np.sin(alpha) ** 2) * np.cos(alpha))
+        F_lift = q_S * (
+                    CL_alpha + P.C_L_q * (c / (2 * Va)) * q + P.C_L_delta_e * de)
+        CD_alpha = P.C_D_p + ((P.C_L_0 + P.C_L_alpha * alpha) ** 2) / \
+                   (np.pi * P.e * P.AR)
+        F_drag = q_S * (
+                    CD_alpha + P.C_D_q * (c / (2 * Va)) * q + P.C_D_delta_e * de)
+        m = q_S * c * (P.C_m_0 + P.C_m_alpha * alpha +
+                                             P.C_m_q * (c / (2. * Va)) * q + P.C_m_delta_e * de)
 
-            if np.isclose(Va, 0., 1e-5) :
-                drag = 0.
-            else:
-                drag = p_dyn * S * (CD0 + CD_alpha * alpha +
-                                    CD_q * c * q * 0.5 / Va +
-                                    CD_delta_e * delta_e)
+        # Lateral
+        b = P.b
+        p = x[SQE.p]
+        r = x[SQE.r]
+        rho = P.rho
+        S = P.S_wing
 
-            Cm0 = params.Cm0
-            Cm_alpha = params.Cm_alpha
-            Cm_q = params.Cm_q
-            Cm_delta_e = params.Cm_delta_e
-            Cm_alpha = Cm0 + Cm_alpha * alpha
-            m = 0.5 * rho * S * c * (Cm_alpha * Va**2 +
-                                     Cm_q * c * q * 0.5 * Va +
-                                     Cm_delta_e * delta_e * Va**2)
+        # Calculating fy
+        fa_y = q_S * (P.C_Y_0 + P.C_Y_beta * beta +
+               P.C_Y_p * (b / (2 * Va)) * p + P.C_Y_r *
+               (b / (2 * Va)) * r + P.C_Y_delta_a * da +
+               P.C_Y_delta_r * dr)
 
-            fx = -drag * np.cos(alpha) + lift * np.sin(alpha)
-            fz = -drag * np.sin(alpha) - lift * np.cos(alpha)
-            return fx, fz, m
+        # Calculating l
+        l = q_S * b * (P.C_ell_0 + P.C_ell_beta * beta +
+            P.C_ell_p * (b / (2 * Va)) * p + P.C_ell_r * (
+                        b / (2 * Va)) *
+            r + P.C_ell_delta_a * da + P.C_ell_delta_r * dr)
 
-        def lateral_forces_moments():
-            const = 0.5 * rho * S
-            CY0 = params.CY0
-            CY_beta = params.CY_beta
-            CY_p = params.CY_p
-            CY_r = params.CY_r
-            CY_delta_a = params.CY_delta_a
-            CY_delta_r = params.CY_delta_r
-            # TODO: factorize some operations in the following expressions (fy, l, n)
-            fy = const * (CY0 * Va**2 +
-                          CY_beta * beta * Va**2 +
-                          CY_p * b * p * 0.5 * Va +
-                          CY_r * r * b * 0.5 * Va +
-                          CY_delta_a * delta_a * Va**2 +
-                          CY_delta_r * delta_r * Va**2)
+        # Calculating n
+        n = q_S * b * (P.C_n_0 + P.C_n_beta * beta +
+            P.C_n_p * (b / (2 * Va)) * p + P.C_n_r * (
+                        b / (2 * Va)) * r +
+            P.C_n_delta_a * da + P.C_n_delta_r * dr)
 
-            Cl0 = params.Cl0
-            Cl_beta = params.Cl_beta
-            Cl_p = params.Cl_p
-            Cl_r = params.Cl_r
-            Cl_delta_a = params.Cl_delta_a
-            Cl_delta_r = params.Cl_delta_r
-            l = b * const * (Cl0 * Va**2 +
-                             Cl_beta * beta * Va**2 +
-                             Cl_p * b * p * 0.5 * Va +
-                             Cl_r * r * b * 0.5 * Va +
-                             Cl_delta_a * delta_a * Va**2 +
-                             Cl_delta_r * delta_r * Va**2)
+        # Combining into force/moment arrays
+        ca = np.cos(alpha)
+        sa = np.sin(alpha)
+        [fa_x, fa_z] = np.array([[ca, -sa], [sa, ca]]) @ np.array([-F_drag, -F_lift])
+        fa = np.array([fa_x, fa_y, fa_z])
+        Ma = np.array([l, m, n])
 
-            Cn0 = params.Cn0
-            Cn_beta = params.Cn_beta
-            Cn_p = params.Cn_p
-            Cn_r = params.Cn_r
-            Cn_delta_a = params.Cn_delta_a
-            Cn_delta_r = params.Cn_delta_r
-            n = b * const * (Cn0 * Va**2 +
-                             Cn_beta * beta * Va**2 +
-                             Cn_p * b * p * 0.5 * Va +
-                             Cn_r * r * b * 0.5 * Va +
-                             Cn_delta_a * delta_a * Va**2 +
-                             Cn_delta_r * delta_r * Va**2)
-            return fy, l, n
+        # Summing forces and moments
+        [fx, fy, fz] = fg + fa + fp
+        [Mx, My, Mz] = Ma + Mp
+        return np.array([fx, fy, fz, Mx, My, Mz])
 
+    def update_true_state_from_forces_moments(self, forces_moments):
+        # Integrate ODE using Runge-Kutta RK4 algorithm
+        time_step = self._dt_simulation
 
-        sphi = np.sin(phi)
-        cphi = np.cos(phi)
-
-        stheta = np.sin(theta)
-        ctheta = np.cos(theta)
-
-        f_aero_x, f_aero_z, m_aero = longitudinal_aerodynamic_forces_moments()
-        f_aero_y, l_aero, n_aero = lateral_forces_moments()
-        g_x, g_y, g_z = compute_gravitational_force(cphi, sphi, ctheta, stheta, mass, g)
-        f_prop_x, f_prop_y, f_prop_z = propeller_forces(params, Va, delta_t)
-        l_prop, m_prop, n_prop = propeller_torques(params, delta_t)
-        fx = f_aero_x + g_x + f_prop_x
-        fy = f_aero_y + g_y + f_prop_y
-        fz = f_aero_z + g_z + f_prop_z
-        l = l_aero + l_prop
-        m = m_aero + m_prop
-        n = n_aero + n_prop
-        return [fx, fy, fz], [l, m, n]
+        dx = compute_kinematics_from_quat(forces_moments, self._state, self.mav_p)
+        k1 = compute_kinematics_from_quat(forces_moments, self._state, self.mav_p)
+        k2 = compute_kinematics_from_quat(forces_moments, self._state + time_step / 2. * k1, self.mav_p)
+        k3 = compute_kinematics_from_quat(forces_moments, self._state + time_step / 2. * k2, self.mav_p)
+        k4 = compute_kinematics_from_quat(forces_moments, self._state + time_step * k3, self.mav_p)
+        self._state += time_step / 6 * (k1 + 2 * k2 + 2 * k3 + k4)
+        # normalize the quaternion
+        self._state[SQE.e0:SQE.e3+1] = normalize_vector(self._state[SQE.e0:SQE.e3+1])
+        self.R_vb = Quaternion2Rotation(self._state[6:10])  # body->vehicle
+        self.R_bv = np.copy(self.R_vb).T  # vehicle->body
+        self._update_true_state()
 
     @staticmethod
     def compute_alpha_beta(Va, u, v, w):
@@ -198,14 +207,14 @@ class FixedwingDynamics(DynamicsBase):
         return alpha, beta
 
     @staticmethod
-    def dynamics(t, x, params, control_inputs, forces_and_moments):
-        forces, moments = forces_and_moments(x, control_inputs)
+    def dynamics(t, x, params, control_inputs, forces_moments):
+        forces_moments = forces_moments(x, control_inputs)
 
-        dx = compute_kinematics(forces, moments, x, params)
+        dx = compute_kinematics_from_quat(forces_moments, x, params)
         return dx
 
     def compute_trimmed_states_inputs(self, Va, gamma, turn_radius, alpha, beta, phi):
-        params = self.params
+        params = self.mav_p
 
         # TODO: Is it clearer to use R var name instead of turn_radius?
         R = turn_radius
@@ -383,9 +392,9 @@ class FixedwingDynamics(DynamicsBase):
         return trimmed_state, trimmed_control
 
     def f(self, x, control_inputs):
-        forces, moments = self.partial_forces_and_moments(x, control_inputs)
+        forces, moments = self.partial_forces_moments(x, control_inputs)
 
-        dx = compute_kinematics(forces, moments, x, self.params)
+        dx = compute_kinematics(forces, moments, x, self.mav_p)
         return dx
 
     @property
@@ -396,7 +405,37 @@ class FixedwingDynamics(DynamicsBase):
     def control_inputs(self, inputs):
         self._control_inputs = inputs
         self.integrator.set_f_params(
-                self.params, self._control_inputs, self.partial_forces_and_moments)
+                self.mav_p, self._control_inputs, self.partial_forces_moments)
+
+    def calc_gamma_chi(self):
+        Vg = self.R_vb @ self._state[3:6]
+        gamma = asin(-Vg[2] / np.linalg.norm(Vg))  # h_dot = Vg*sin(gamma)
+
+        Vg_h = Vg * np.cos(gamma)
+        chi = acos(Vg_h[0] / np.linalg.norm(Vg_h))
+        if Vg_h[1] < 0:
+            chi *= -1
+
+        return gamma, chi
+
+    def _update_true_state(self):
+        phi, theta, psi = Quaternion2Euler(self._state[6:10])
+        self.true_state.pn = self._state[0]
+        self.true_state.pe = self._state[1]
+        self.true_state.h = -self._state[2]
+        self.true_state.Va = self._Va
+        self.true_state.alpha = self._alpha
+        self.true_state.beta = self._beta
+        self.true_state.phi = phi
+        self.true_state.theta = theta
+        self.true_state.psi = psi
+        self.true_state.Vg = np.linalg.norm(self._state[3:6])
+        self.true_state.gamma, self.true_state.chi = self.calc_gamma_chi()
+        self.true_state.p = self._state[10]
+        self.true_state.q = self._state[11]
+        self.true_state.r = self._state[12]
+        self.true_state.wn = self._wind[0]
+        self.true_state.we = self._wind[1]
 
 
 def compute_dynamic_pressure(rho, Va):

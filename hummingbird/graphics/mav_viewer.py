@@ -16,11 +16,11 @@ class MavViewer:
         grid = gl.GLGridItem()  # make a grid to represent the ground
         grid.scale(100, 100, 100)  # set the size of the grid (distance between each line)
         self.window.addItem(grid)  # add grid to viewer
-        self.window.setCameraPosition(distance=400) # distance from center of plot to camera
+        self.window.setCameraPosition(distance=400)  # distance from center of plot to camera
         self.window.setBackgroundColor('k')  # set background color to black
         self.window.show()  # display configured window
-        self.window.raise_() # bring window to the front
-        self.plot_initialized = False # has the spacecraft been plotted yet?
+        self.window.raise_()  # bring window to the front
+        self.plot_initialized = False  # has the spacecraft been plotted yet?
         # get points that define the non-rotated, non-translated spacecraft and the mesh colors
         self.points, self.meshColors = get_mav_points()
 

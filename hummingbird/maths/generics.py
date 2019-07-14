@@ -1,4 +1,5 @@
 import numpy as np
+from warnings import warn
 
 
 def compute_sigmoid(alpha_0, alpha, M):
@@ -10,3 +11,11 @@ def compute_sigmoid(alpha_0, alpha, M):
 
 def rotate(points, rotation_matrix):
     return points * rotation_matrix
+
+
+def normalize_vector(vect):
+    norm = np.linalg.norm(vect)
+    if np.isclose(norm, 0):
+        warn("Impossible to normalize vector")
+        return vect
+    return vect / np.linalg.norm(vect)

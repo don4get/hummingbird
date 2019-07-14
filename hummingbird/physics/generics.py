@@ -75,4 +75,4 @@ def propeller_thrust_torque(dt, Va, mav_p):
     fp_x = rho * n ** 2 * D ** 4 * C_T
     Mp_x = rho * n ** 2 * D ** 5 * C_Q
 
-    return fp_x, Mp_x
+    return np.array([fp_x, 0, 0]), np.array([Mp_x, 0, 0])

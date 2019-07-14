@@ -4,6 +4,7 @@ import numpy as np
 
 from hummingbird.parameters.constants import StateEnum, BodyFrameEnum
 from hummingbird.physics.generics import compute_gamma
+from hummingbird.tools.rotations import Quaternion2Rotation
 
 
 def compute_kinematics(forces, moments, x, attrs):
@@ -58,6 +59,70 @@ def compute_kinematics(forces, moments, x, attrs):
     dx = np.concatenate((d_pos, d_vel, d_att, d_rates))
 
     return dx
+
+
+def compute_kinematics_from_quat(forces_moments, state, params):
+    """
+    for the dynamics xdot = f(x, u), returns f(x, u)
+    """
+    # extract the states
+    pn = state[0]
+    pe = state[1]
+    pd = state[2]
+    u = state[3]
+    v = state[4]
+    w = state[5]
+    e0 = state[6]
+    e1 = state[7]
+    e2 = state[8]
+    e3 = state[9]
+    p = state[10]
+    q = state[11]
+    r = state[12]
+    #   extract forces/moments
+    fx = forces_moments[0]
+    fy = forces_moments[1]
+    fz = forces_moments[2]
+    l = forces_moments[3]
+    m = forces_moments[4]
+    n = forces_moments[5]
+
+    R_vb = Quaternion2Rotation(np.array([e0, e1, e2, e3]))  # body->vehicle
+
+    # position kinematics
+    pn_dot, pe_dot, pd_dot = R_vb @ np.array([u, v, w])
+
+    # position dynamics
+    vec_pos = np.array([r * v - q * w, p * w - r * u, q * u - p * v])
+    u_dot, v_dot, w_dot = vec_pos + 1 / params.mass * np.array([fx, fy, fz])
+
+    # rotational kinematics
+    mat_rot = np.array([[0, -p, -q, -r],
+                        [p, 0, r, -q],
+                        [q, -r, 0, p],
+                        [r, q, -p, 0]])
+    e0_dot, e1_dot, e2_dot, e3_dot = 0.5 * mat_rot @ np.array([e0, e1, e2, e3])
+
+    # rotational dynamics
+    g1 = params.gamma1
+    g2 = params.gamma2
+    g3 = params.gamma3
+    g4 = params.gamma4
+    g5 = params.gamma5
+    g6 = params.gamma6
+    g7 = params.gamma7
+    g8 = params.gamma8
+
+    vec_rot = np.array([g1 * p * q - g2 * q * r, g5 * p * r - g6 * (p ** 2 - r ** 2), g7 * p * q - g1 * q * r])
+    vec_rot2 = np.array([g3 * l + g4 * n, m / params.Jy, g4 * l + g8 * n])
+
+    p_dot, q_dot, r_dot = vec_rot + vec_rot2
+
+    # collect the derivative of the states
+    x_dot = np.array([pn_dot, pe_dot, pd_dot, u_dot, v_dot, w_dot,
+                      e0_dot, e1_dot, e2_dot, e3_dot, p_dot, q_dot, r_dot])
+
+    return x_dot
 
 
 def compute_trigonometric_attitude_vector(attitude):

@@ -24,7 +24,7 @@ class DynamicsBase(object):
         self.dt = dt_integration
         self.x0 = x0
         self.t0 = t0
-        self.x = x0
+        self._state = x0
         self.t = t0
 
     def set_integrator(self, ode_func, integrator, jac=None, **kwargs):
@@ -54,7 +54,7 @@ class DynamicsBase(object):
             raise Exception('Initialize integrator first using set_integrator')
         while self.integrator.successful() and self.integrator.t < t1:
             self.integrator.integrate(self.integrator.t + self.dt)
-            self.x = self.integrator.y
+            self._state = self.integrator.y
             self.t = self.integrator.t
 
 

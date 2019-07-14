@@ -5,6 +5,7 @@ from hummingbird.parameters import simulation_parameters as sim_p
 from hummingbird.physics.generics import propeller_thrust_torque
 from hummingbird.tools.rotations import Quaternion2Rotation, Quaternion2Euler
 from math import asin, exp, acos
+from hummingbird.parameters.constants import StateQuatEnum
 
 np.set_printoptions(suppress=True, precision=4)
 
@@ -13,6 +14,7 @@ class MavDynamics:
     def __init__(self, mav_p=MavParameters(), dt=sim_p.dt_simulation):
         self.mav_p = mav_p
         self._dt_simulation = dt
+        self._state = np.zeros(StateQuatEnum.size)
         self.reset_state()
 
         self.R_vb = Quaternion2Rotation(self._state[6:10])  # Rotation body->vehicle

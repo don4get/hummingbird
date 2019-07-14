@@ -68,6 +68,47 @@ class StateEnum:
     """ Size of the enum"""
 
 
+class StateQuatEnum:
+    """ State vector enum
+
+    The state vector is a [12x1] vector composed of:
+    NED position,
+    Body velocities,
+    Attitude with Euler representation,
+    Attitude derivatives.
+
+    .. todo:: Check attitude derivative precise definition
+    """
+    pn = 0
+    """ North position [m]"""
+    pe = 1
+    """ East position [m]"""
+    pd = 2
+    """ Down position [m]"""
+    u = 3
+    """ X velocity in Body frame [m/s]"""
+    v = 4
+    """ Y velocity in Body frame [m/s]"""
+    w = 5
+    """ Z velocity in Body frame [m/s]"""
+    e0 = 6
+    """ First element of the normalized attitude quaternion"""
+    e1 = 7
+    """ Second element of the normalized attitude quaternion"""
+    e2 = 8
+    """ Third element of the normalized attitude quaternion"""
+    e3 = 9
+    """ Fourth element of the normalized attitude quaternion"""
+    p = 10
+    """ Roll derivative [rad/sec]"""
+    q = 11
+    """ Pitch derivative [rad/sec]"""
+    r = 12
+    """ Yaw derivative [rad/sec]"""
+    size = 13
+    """ Size of the enum"""
+
+
 class ActuatorEnum:
     """ Actuator vector enum
 
