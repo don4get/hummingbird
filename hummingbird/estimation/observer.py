@@ -4,6 +4,7 @@ from hummingbird.message_types.msg_state import MsgState
 from hummingbird.estimation.ekf_attitude import EkfAttitude
 from hummingbird.estimation.ekf_position import EkfPosition
 from hummingbird.maths.filters.alpha_filter import AlphaFilter
+from hummingbird.parameters.constants import PhysicalConstants as pc
 
 
 class Observer:
@@ -44,8 +45,8 @@ class Observer:
         diff_p = self.lpf_diff.update(measurements.diff_pressure)
         if diff_p < 0:
             diff_p = 0
-        self.estimated_state.h = static_p / (mav_p.rho * mav_p.gravity)
-        self.estimated_state.Va = np.sqrt(2 * diff_p / mav_p.rho)
+        self.estimated_state.h = static_p / (pc.rho0 * pc.g)
+        self.estimated_state.Va = np.sqrt(2 * diff_p / pc.rho0)
 
         # estimate phi and theta with simple ekf
         self.attitude_ekf.update(self.estimated_state, measurements)

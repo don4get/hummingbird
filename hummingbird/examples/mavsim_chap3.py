@@ -12,13 +12,13 @@ end_time = 50.
 
 mav_view = MavViewer()
 data_view = DataViewer(800, 0)
-mav = MavDynamics(sim_p.ts_simulation)
+mav = MavDynamics(sim_p.dt_simulation)
 cmd_state = MsgState()
 
 if enable_video:
     video = VideoWriter(video_name="chap3_video.avi",
                         bounding_box=(0, 0, 800, 600),
-                        output_rate=sim_p.ts_video)
+                        output_rate=sim_p.dt_video)
 
 FM_list = ['fx', 'fy', 'fz', 'l', 'm', 'n']
 # main simulation loop
@@ -43,13 +43,13 @@ for i in range(6):
         data_view.update(mav.true_state,  # true states
                          mav.true_state,  # estimated states
                          mav.true_state,  # commanded states
-                         sim_p.ts_simulation)
+                         sim_p.dt_simulation)
 
         if enable_video:
             video.update(sim_time)
 
         # -------increment time-------------
-        sim_time += sim_p.ts_simulation
+        sim_time += sim_p.dt_simulation
 
 print("Press Ctrl-Q to exit...")
 if enable_video:

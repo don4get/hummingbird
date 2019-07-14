@@ -4,7 +4,7 @@ from hummingbird.parameters import simulation_parameters as sim, planner_paramet
 from hummingbird.graphics.data_viewer import DataViewer
 from hummingbird.physics.wind_simulation import WindSimulation
 from hummingbird.control.autopilot import Autopilot
-from hummingbird.physics.mav_dynamics import MavDynamics
+from hummingbird.physics.mav import Mav
 from hummingbird.estimation.observer import Observer
 from hummingbird.guidance.path_follower import PathFollower
 from hummingbird.guidance.path_manager \
@@ -22,10 +22,10 @@ if enable_data:
     data_view = DataViewer(*screen_pos)  # initialize view of data plots
 
 # initialize elements of the architecture
-wind = WindSimulation(sim.ts_simulation)
-mav = MavDynamics(sim.ts_simulation)
-ctrl = Autopilot(sim.ts_controller)
-obsv = Observer(sim.ts_observer)
+wind = WindSimulation()
+mav = Mav()
+ctrl = Autopilot(sim.dt_controller)
+obsv = Observer(sim.dt_observer)
 path_follow = PathFollower()
 path_manage = PathManager()
 path_plan = PathPlanner()
@@ -36,13 +36,13 @@ msg_map = MsgMap(plan)
 sim_time = sim.start_time
 
 delta = np.zeros(4)
-mav.update(delta)  # propagate the MAV dynamics
+mav.dynamics.update(delta)  # propagate the MAV dynamics
 
 # main simulation loop
 print("Press Command-Q to exit...")
 while sim_time < sim.end_time:
     # -------observer-------------
-    measurements = mav.update_sensors()  # get sensor measurements
+    measurements = mav.sensors.update_sensors(mav.dynamics.true_state, mav.dynamics._forces)  # get sensor measurements
     estimated_state = obsv.update(measurements)  # estimate states from measurements
 
     # -------path planner - ----
@@ -60,14 +60,14 @@ while sim_time < sim.end_time:
 
     # -------physical system-------------
     current_wind = wind.update()  # get the new wind vector
-    mav.update(delta, current_wind)  # propagate the MAV dynamics
+    mav.dynamics.update(delta, current_wind)  # propagate the MAV dynamics
 
     # -------update viewer-------------
-    world_view.update(msg_map, waypoints, path, mav.true_state)  # plot path and MAV
+    world_view.update(msg_map, waypoints, path, mav.dynamics.true_state)  # plot path and MAV
     if enable_data:
-        data_view.update(mav.true_state,  # true states
+        data_view.update(mav.dynamics.true_state,  # true states
                          estimated_state,  # estimated states
                          commanded_state,  # commanded states
-                         sim.ts_simulation)
+                         sim.dt_simulation)
 
-    sim_time += sim.ts_simulation
+    sim_time += sim.dt_simulation

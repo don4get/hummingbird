@@ -1,6 +1,6 @@
 from hummingbird.parameters import simulation_parameters as SP
 
-ts_control = SP.ts_controller
+ts_control = SP.dt_controller
 
 gravity = 9.8
 sigma = 0.05

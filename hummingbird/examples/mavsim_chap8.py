@@ -3,7 +3,7 @@ from hummingbird.parameters import simulation_parameters as sim_p
 from hummingbird.graphics.mav_viewer import MavViewer
 from hummingbird.graphics.data_viewer import DataViewer
 from hummingbird.physics.wind_simulation import WindSimulation
-from hummingbird.physics.mav_dynamics import MavDynamics
+from hummingbird.physics.mav import Mav
 from hummingbird.control.autopilot import Autopilot
 from hummingbird.estimation.observer import Observer
 from hummingbird.tools.signals import Signals
@@ -19,11 +19,11 @@ if enable_data:
 
 
 # initialize elements of the architecture
-wind = WindSimulation(sim_p.ts_simulation)
-mav = MavDynamics(sim_p.ts_simulation)
-ctrl = Autopilot(sim_p.ts_simulation)
-obsv = Observer(sim_p.ts_controller)
-measurements = mav.sensors
+wind = WindSimulation()
+mav = Mav()
+ctrl = Autopilot(sim_p.dt_simulation)
+obsv = Observer(sim_p.dt_controller)
+measurements = mav.sensors.sensors
 
 # autopilot commands
 
@@ -59,21 +59,21 @@ while sim_time < sim_p.end_time:
     delta, commanded_state = ctrl.update(commands, estimated_state)
 
     # -------physical system-------------
-    current_wind = wind.update(Va=mav._Va)  # get the new wind vector
-    mav.update(delta, current_wind)  # propagate the MAV dynamics, sensor data
-    measurements = mav.update_sensors()  # get sensor measurements
+    current_wind = wind.update(Va=mav.dynamics._Va)  # get the new wind vector
+    mav.dynamics.update(delta, current_wind)  # propagate the MAV dynamics, sensor data
+    measurements = mav.sensors.update_sensors(mav.dynamics.true_state, mav.dynamics._forces)  # get sensor measurements
 
     # -------update viewer-------------
-    mav_view.update(mav.true_state)  # plot body of MAV
-    data_view.update(mav.true_state,  # true states
+    mav_view.update(mav.dynamics.true_state)  # plot body of MAV
+    data_view.update(mav.dynamics.true_state,  # true states
                      estimated_state,  # estimated states
                      commanded_state,  # commanded states
-                     sim_p.ts_simulation)
+                     sim_p.dt_simulation)
     if enable_data:
-        data_view.update(mav.true_state,  # true states
+        data_view.update(mav.dynamics.true_state,  # true states
                          estimated_state,  # estimated states
                          commanded_state,  # commanded states
-                         sim_p.ts_simulation)
+                         sim_p.dt_simulation)
 
     # -------increment time-------------
-    sim_time += sim_p.ts_simulation
+    sim_time += sim_p.dt_simulation

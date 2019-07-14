@@ -1,9 +1,11 @@
 import numpy as np
-from hummingbird.parameters import aerosonde_parameters as MAV
+from hummingbird.parameters.aerosonde_parameters import MavParameters
+from hummingbird.parameters import simulation_parameters as sim_p
 
 
 class WindSimulation:
-    def __init__(self, Ts):
+    def __init__(self, mav_p=MavParameters(), dt=sim_p.dt_simulation):
+        self.mav_p = mav_p
         # steady state wind defined in the inertial frame
         # self._steady_state = np.array([0., 0., 0.])
         self._steady_state = np.array([3., 1., 0.])
@@ -18,7 +20,7 @@ class WindSimulation:
         self.Lv = self.Lu
         self.Lw = 50.0
 
-        self.Va = MAV.u0
+        self.Va = self.mav_p.u0
         self._A = self._compute_A()
         self._B = np.array([[1, 0, 0],
                             [0, 1, 0],
@@ -27,9 +29,9 @@ class WindSimulation:
                             [0, 0, 0]])
         self._C = self._compute_C()
         self._gust_state = np.zeros(5)
-        self._Ts = Ts
+        self._Ts = dt
 
-    def update(self, Va=MAV.u0):
+    def update(self, Va=MavParameters.u0):
         # returns a six vector.
         #   The first three elements are the steady state wind in the inertial frame
         #   The second three elements are the gust in the body frame

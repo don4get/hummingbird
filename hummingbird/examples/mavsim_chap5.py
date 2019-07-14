@@ -15,8 +15,8 @@ if enable_data:
     data_view = DataViewer()  # initialize view of data plots
 
 # initialize elements of the architecture
-wind = WindSimulation(sim_p.ts_simulation)
-mav = MavDynamics(sim_p.ts_simulation)
+wind = WindSimulation(sim_p.dt_simulation)
+mav = MavDynamics(sim_p.dt_simulation)
 
 # use compute_trim function to compute trim state and trim input
 Va = 25.
@@ -54,7 +54,7 @@ while sim_time < sim_p.end_time:
         data_view.update(mav.true_state,  # true states
                          mav.true_state,  # estimated states
                          mav.true_state,  # commanded states
-                         sim_p.ts_simulation)
+                         sim_p.dt_simulation)
 
     # -------increment time-------------
-    sim_time += sim_p.ts_simulation
+    sim_time += sim_p.dt_simulation

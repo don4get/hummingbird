@@ -17,11 +17,11 @@ if enable_data:
 if enable_video:
     video = VideoWriter(video_name="chap4_video.avi",
                         bounding_box=(0, 0, 1000, 1000),
-                        output_rate=sim_p.ts_video)
+                        output_rate=sim_p.dt_video)
 
 # initialize elements of the architecture
-wind = WindSimulation(sim_p.ts_simulation)
-mav = MavDynamics(sim_p.ts_simulation)
+wind = WindSimulation(sim_p.dt_simulation)
+mav = MavDynamics(sim_p.dt_simulation)
 Va = 0
 
 # initialize the simulation time
@@ -49,12 +49,12 @@ while sim_time < sim_p.end_time:
         data_view.update(mav.true_state,  # true states
                          mav.true_state,  # estimated states
                          mav.true_state,  # commanded states
-                         sim_p.ts_simulation)
+                         sim_p.dt_simulation)
     if enable_video:
         video.update(sim_time)
 
     # -------increment time-------------
-    sim_time += sim_p.ts_simulation
+    sim_time += sim_p.dt_simulation
 
 if enable_video:
     video.close()

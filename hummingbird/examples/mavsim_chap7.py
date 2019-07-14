@@ -3,7 +3,7 @@ from hummingbird.parameters import simulation_parameters as sim_p
 from hummingbird.graphics.mav_viewer import MavViewer
 from hummingbird.graphics.data_viewer import DataViewer
 from hummingbird.physics.wind_simulation import WindSimulation
-from hummingbird.physics.mav_dynamics import MavDynamics
+from hummingbird.physics.mav import Mav
 from hummingbird.control.autopilot import Autopilot
 from hummingbird.tools.signals import Signals
 from hummingbird.message_types.msg_autopilot import MsgAutopilot
@@ -17,9 +17,9 @@ if enable_data:
     data_view = DataViewer(*pos)  # initialize view of data plots
 
 # initialize elements of the architecture
-wind = WindSimulation(sim_p.ts_simulation)
-mav = MavDynamics(sim_p.ts_simulation)
-ctrl = Autopilot(sim_p.ts_controller)
+wind = WindSimulation()
+mav = Mav()
+ctrl = Autopilot(sim_p.dt_controller)
 
 # autopilot commands
 commands = MsgAutopilot()
@@ -49,21 +49,21 @@ while sim_time < sim_p.end_time:
     commands.altitude_command = h_command.square(sim_time)
 
     # -------controller-------------
-    estimated_state = mav.true_state  # uses true states in the control
+    estimated_state = mav.dynamics.true_state  # uses true states in the control
     delta, commanded_state = ctrl.update(commands, estimated_state)
 
     # -------physical system-------------
     current_wind = wind.update()  # get the new wind vector
-    mav.update(delta, current_wind)  # propagate the MAV dynamics
-    mav.update_sensors()  # update the sensors
+    mav.dynamics.update(delta, current_wind)  # propagate the MAV dynamics
+    mav.sensors.update_sensors(mav.dynamics.true_state, mav.dynamics._forces)  # update the sensors
 
     # -------update viewer-------------
-    mav_view.update(mav.true_state)  # plot body of MAV
+    mav_view.update(mav.dynamics.true_state)  # plot body of MAV
     if enable_data:
-        data_view.update(mav.true_state,  # true states
+        data_view.update(mav.dynamics.true_state,  # true states
                          estimated_state,  # estimated states
                          commanded_state,  # commanded states
-                         sim_p.ts_simulation)
+                         sim_p.dt_simulation)
 
     # -------increment time-------------
-    sim_time += sim_p.ts_simulation
+    sim_time += sim_p.dt_simulation

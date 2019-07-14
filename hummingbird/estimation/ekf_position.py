@@ -1,6 +1,7 @@
 import numpy as np
 from hummingbird.parameters import simulation_parameters as sim_p, aerosonde_parameters as mav_p
-import hummingbird.parameters.sensor_parameters as sensor_p
+from hummingbird.parameters.sensor_parameters import SensorParameters
+from hummingbird.parameters.constants import PhysicalConstants as pc
 from hummingbird.tools.rotations import jacobian
 
 
@@ -8,11 +9,11 @@ class EkfPosition:
     # implement continuous-discrete EKF to estimate pn, pe, chi, Vg
     def __init__(self):
         self.Q = np.eye(7) * 0.01
-        self.R_gps = np.diag([sensor_p.gps_n_sigma, sensor_p.gps_e_sigma,
-                              sensor_p.gps_Vg_sigma, sensor_p.gps_course_sigma]) ** 2
+        self.R_gps = np.diag([SensorParameters().gps_n_sigma, SensorParameters().gps_e_sigma,
+                              SensorParameters().gps_Vg_sigma, SensorParameters().gps_course_sigma]) ** 2
         self.R_pseudo = np.eye(2) * 0.01
         self.N = 25  # number of prediction step per sample
-        self.Ts = (sim_p.ts_controller / self.N)
+        self.Ts = (sim_p.dt_controller / self.N)
         self.xhat = np.zeros(7)  # n, pe, Vg, chi, wn, we, psi
         self.xhat[2] = 25  # Vg
         self.P = np.eye(7) * 0.5
@@ -39,7 +40,7 @@ class EkfPosition:
         theta = state.theta
         phi = state.phi
         Va = state.Va
-        g = mav_p.gravity
+        g = pc.g
 
         Vg = x[2]
         chi = x[3]

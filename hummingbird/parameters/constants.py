@@ -25,6 +25,8 @@ class PhysicalConstants:
     """ Standard acceleration due to gravity [m/s²]"""
     absoluteZero = 273.15
     """ Absolute zero temperature [K]"""
+    rho0 = 1.225
+    """ Air density at sea level in ISA model"""
 
 
 class StateEnum:
