@@ -1,10 +1,11 @@
 from hummingbird.simulation.simulator import Simulator
 from hummingbird.graphics.mav_viewer import MavViewer
 from hummingbird.graphics.video_writer import VideoWriter
-from hummingbird.physics.mav_dynamics import MavDynamics
+from hummingbird.physics.fixedwing_dynamics import FixedwingDynamics
 from hummingbird.graphics.data_viewer import DataViewer
 from hummingbird.physics.wind_simulation import WindSimulation
 import numpy as np
+import sys
 
 
 class DynamicsSimulator(Simulator):
@@ -13,12 +14,12 @@ class DynamicsSimulator(Simulator):
         if self.record_video:
             self.video = VideoWriter(video_name="dynamics.avi",
                                      bounding_box=(0, 0, 1000, 1000),
-                                     output_rate=self.sim_p.ts_video)
+                                     output_rate=self.sim_p.dt_video)
 
         self.sim_p.end_time = 50.
         self.mav_view = MavViewer()
         self.data_view = DataViewer(800, 0)
-        self.mav = MavDynamics(self.sim_p.ts_simulation)
+        self.mav = FixedwingDynamics()
         self.config = config
         if self.config == "windy":
             self.wind = WindSimulation(self.sim_p.ts_simulation)
@@ -41,22 +42,23 @@ class DynamicsSimulator(Simulator):
             while sim_time < self.sim_p.end_time:
                 # -------vary states to check viewer-------------
                 Va = self.mav._Va
-                current_wind = self.wind.update(Va)
-                self.mav._update_velocity_data(current_wind)
                 self.mav.update_true_state_from_forces_moments(forces_moments)
+                # current_wind = self.wind.update(Va)
 
                 # -------update viewer and video-------------
                 self.mav_view.update(self.mav.true_state)  # plot body of MAV
                 self.data_view.update(self.mav.true_state,  # true states
                                       self.mav.true_state,  # estimated states
                                       self.mav.true_state,  # commanded states
-                                      self.sim_p.ts_simulation)
+                                      self.sim_p.dt_simulation)
 
                 if self.record_video:
                     self.video.update(sim_time)
 
                 # -------increment time-------------
-                sim_time += self.sim_p.ts_simulation
+                sim_time += self.sim_p.dt_simulation
 
         if self.record_video:
             self.video.close()
+
+        sys.exit(self.mav_view.app.exec_())

@@ -74,7 +74,7 @@ class FixedwingDynamics(DynamicsBase):
                                 self.mav_p.q0,  # (11)
                                 self.mav_p.r0])  # (12)
 
-    def update(self, delta, wind):
+    def update(self, delta, wind=np.zeros(6)):
         self.control_inputs = delta
         self._wind = wind
         if self.control_inputs is not None:

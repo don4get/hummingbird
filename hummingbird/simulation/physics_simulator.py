@@ -8,7 +8,7 @@ import numpy as np
 import sys
 
 
-class FixedwingPhysicsSimulator(Simulator):
+class PhysicsSimulator(Simulator):
     def __init__(self, record_video=False, display_data=True, config="still_air"):
         Simulator.__init__(self, record_video)
 

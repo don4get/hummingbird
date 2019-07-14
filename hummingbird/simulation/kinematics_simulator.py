@@ -2,7 +2,7 @@ from hummingbird.simulation.simulator import Simulator
 from hummingbird.message_types.msg_state import MsgState
 from hummingbird.graphics.mav_viewer import MavViewer
 from hummingbird.graphics.video_writer import VideoWriter
-
+import sys
 
 class KinematicsSimulator(Simulator):
     def __init__(self, record_video=False, config="translation"):
@@ -35,6 +35,7 @@ class KinematicsSimulator(Simulator):
 
         if self.record_video:
             self.video.close()
+        sys.exit(self.mav_view.app.exec_())
 
     def trans_rot(self, t):
         if t < self.sim_p.end_time / 6:
