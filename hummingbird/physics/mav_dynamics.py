@@ -69,7 +69,7 @@ class MavDynamics:
         k2 = self._derivatives(self._state + time_step / 2. * k1, forces_moments)
         k3 = self._derivatives(self._state + time_step / 2. * k2, forces_moments)
         k4 = self._derivatives(self._state + time_step * k3, forces_moments)
-        self._state += time_step / 6 * (k1 + 2 * k2 + 2 * k3 + k4)
+        self._state += time_step / 6. * (k1 + 2. * k2 + 2. * k3 + k4)
         # normalize the quaternion
         e0 = self._state[6]
         e1 = self._state[7]
@@ -174,11 +174,10 @@ class MavDynamics:
         dt = delta[3]
 
         # gravity
+        self.R_bv = Quaternion2Rotation(self._state[6:10]).T
         fg = self.R_bv @ np.array([0, 0, self.mav_p.mass * self.mav_p.gravity])
 
-        thrust, torque = propeller_thrust_torque(dt, self._Va, self.mav_p)
-        fp = np.array([thrust, 0, 0])
-        Mp = np.array([torque, 0, 0])
+        fp, Mp = propeller_thrust_torque(dt, self._Va, self.mav_p)
 
         # Aerodynamic forces/moments
 
@@ -256,6 +255,8 @@ class MavDynamics:
 
     def _update_true_state(self):
         phi, theta, psi = Quaternion2Euler(self._state[6:10])
+        self.R_vb = Quaternion2Rotation(self._state[6:10])
+        self.R_bv = self.R_vb.T 
         self.true_state.pn = self._state[0]
         self.true_state.pe = self._state[1]
         self.true_state.h = -self._state[2]

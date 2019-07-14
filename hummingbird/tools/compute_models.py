@@ -1,9 +1,12 @@
 import numpy as np
 from hummingbird.tools.rotations import Quaternion2Euler
 from control import TransferFunction as TF
-from hummingbird.parameters import aerosonde_parameters as mav_p
+from hummingbird.parameters.aerosonde_parameters import MavParameters
 from hummingbird.physics.generics import propeller_thrust_torque
 import pickle as pkl
+
+
+mav_p = MavParameters()
 
 
 def compute_tf_model(mav, trim_state, trim_input):
@@ -64,7 +67,7 @@ def dT_dVa(mav, Va, delta_t):
     fp1, _ = propeller_thrust_torque(delta_t, Va - epsilon, mav_p)
     fp2, _ = propeller_thrust_torque(delta_t, Va + epsilon, mav_p)
 
-    dThrust = (fp2 - fp1) / (2 * epsilon)
+    dThrust = (fp2[0] - fp1[0]) / (2 * epsilon)
     return dThrust
 
 
@@ -74,7 +77,7 @@ def dT_ddelta_t(mav, Va, delta_t):
     fp1, _ = propeller_thrust_torque(delta_t - epsilon, Va, mav_p)
     fp2, _ = propeller_thrust_torque(delta_t + epsilon, Va, mav_p)
 
-    dThrust = (fp2 - fp1) / (2 * epsilon)
+    dThrust = (fp2[0] - fp1[0]) / (2 * epsilon)
     return dThrust
 
 # def compute_ss_model(mav, trim_state, trim_input):

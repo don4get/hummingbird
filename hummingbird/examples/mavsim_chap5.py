@@ -15,14 +15,15 @@ if enable_data:
     data_view = DataViewer()  # initialize view of data plots
 
 # initialize elements of the architecture
-wind = WindSimulation(sim_p.dt_simulation)
-mav = MavDynamics(sim_p.dt_simulation)
+wind = WindSimulation()
+mav = MavDynamics()
 
 # use compute_trim function to compute trim state and trim input
 Va = 25.
 gamma = 0. * np.pi / 180.
 trim_state, trim_input = compute_trim(mav, Va, gamma)
 mav._state = trim_state  # set the initial state of the mav to the trim state
+mav._update_true_state()
 delta = np.copy(trim_input)  # set input to constant constant trim input
 print('trim_input:', trim_input)
 print('trim_state:', trim_state)
@@ -45,7 +46,6 @@ while sim_time < sim_p.end_time:
     # current_wind = wind.update()  # get the new wind vector
     forces_moments = mav._forces_moments(delta)
     mav._update_velocity_data(np.zeros(6))
-    print("Forces and moments: {}".format(forces_moments))
     mav.update_true_state_from_forces_moments(forces_moments)
 
     # -------update viewer-------------
