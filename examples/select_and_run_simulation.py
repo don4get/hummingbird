@@ -15,7 +15,7 @@ def main():
     elif conf == 4:
         simu = TrimSimulator()
 
-    simu.sim_p.end_time = 10
+    simu.sim_p.end_time = 100
     simu.simulate()
 
 

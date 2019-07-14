@@ -6,8 +6,7 @@ from hummingbird.physics.fixedwing_dynamics import FixedwingDynamics
 from hummingbird.parameters import simulation_parameters as sim_p
 from hummingbird.graphics.mav_viewer import MavViewer
 from hummingbird.graphics.data_viewer import DataViewer
-from hummingbird.physics.wind_simulation import WindSimulation
-from hummingbird.tools.trim import compute_trim
+from hummingbird.tools.trim import compute_trim, compute_gradient_descent_trim
 from hummingbird.tools.compute_models import compute_tf_model
 
 
@@ -28,9 +27,19 @@ class TrimSimulator(Simulator):
 
     def simulate(self):
         Va = 25.
-        gamma = 0. * np.pi / 180.
-        trim_state, trim_input = compute_trim(self.mav, Va, gamma)
+        gamma = -10. * np.pi / 180.
+        turn_radius = np.inf
+        trim_state, trim_input = compute_trim(self.mav, Va, gamma, turn_radius)
+        # trim_state, trim_input = compute_gradient_descent_trim(self.mav.mav_p,
+        #                                                        self.mav.dynamics,
+        #                                                        Va,
+        #                                                        gamma,
+        #                                                        turn_radius,
+        #                                                        max_iters=5000,
+        #                                                        epsilon=1e-8,
+        #                                                        kappa=1e-6)
         self.mav._state = trim_state  # set the initial state of the mav to the trim state
+        self.mav.integrator.set_initial_value(self.mav._state, sim_p.start_time)
         self.mav._update_true_state()
         delta = np.copy(trim_input)  # set input to constant constant trim input
         print('trim_input:', trim_input)
@@ -50,7 +59,7 @@ class TrimSimulator(Simulator):
         print("Press Command-Q to exit...")
         while sim_time < sim_p.end_time:
 
-            forces_moments = self.mav.update(delta)
+            self.mav.update(delta)
 
             # -------update viewer-------------
             self.mav_view.update(self.mav.true_state)  # plot body of MAV

@@ -2,7 +2,7 @@ import numpy as np
 from hummingbird.parameters.constants import StateEnum, ActuatorEnum
 
 
-def gradient_descent(J, alpha, beta, phi, max_iters=5000, epsilon=1e-8, kappa=1e-6):
+def gradient_descent(J, f, alpha, beta, phi, max_iters=5000, epsilon=1e-8, kappa=1e-6):
     """ Gradient descent algorithm
 
     """
@@ -12,10 +12,10 @@ def gradient_descent(J, alpha, beta, phi, max_iters=5000, epsilon=1e-8, kappa=1e
         alpha_plus = alpha + epsilon
         beta_plus = beta + epsilon
         phi_plus = phi + epsilon
-        J0 = J(alpha, beta, phi)
-        dJ_dalpha = (J(alpha_plus, beta, phi) - J0) / epsilon
-        dJ_dbeta = (J(alpha, beta_plus, phi) - J0) / epsilon
-        dJ_dphi = (J(alpha, beta, phi_plus) - J0) / epsilon
+        J0 = J(f, alpha, beta, phi)
+        dJ_dalpha = (J(f, alpha_plus, beta, phi) - J0) / epsilon
+        dJ_dbeta = (J(f, alpha, beta_plus, phi) - J0) / epsilon
+        dJ_dphi = (J(f, alpha, beta, phi_plus) - J0) / epsilon
         alpha = alpha - kappa * dJ_dalpha
         beta = beta - kappa * dJ_dbeta
         phi = phi - kappa * dJ_dphi
@@ -47,3 +47,4 @@ def linearize(self, nominal_state, nominal_control_input, epsilon=1e-8):
         B[:, col] = (f_ - f_nominal) / epsilon
         input_mask[col] = 0.0
     return A, B
+

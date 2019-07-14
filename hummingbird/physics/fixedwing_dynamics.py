@@ -420,6 +420,8 @@ class FixedwingDynamics(DynamicsBase):
 
     def _update_true_state(self):
         phi, theta, psi = Quaternion2Euler(self._state[6:10])
+        self.R_vb = Quaternion2Rotation(self._state[6:10])
+        self.R_bv = self.R_vb.T
         self.true_state.pn = self._state[0]
         self.true_state.pe = self._state[1]
         self.true_state.h = -self._state[2]
