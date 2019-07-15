@@ -3,10 +3,9 @@ import numpy as np
 from hummingbird.simulation.simulator import Simulator
 from hummingbird.graphics.video_writer import VideoWriter
 from hummingbird.physics.fixed_wing_dynamics import FixedWingDynamics
-from hummingbird.parameters import simulation_parameters as sim_p
 from hummingbird.graphics.mav_viewer import MavViewer
 from hummingbird.graphics.data_viewer import DataViewer
-from hummingbird.tools.trim import compute_trim, compute_gradient_descent_trim
+from hummingbird.tools.trim import compute_trim
 from hummingbird.tools.compute_models import compute_tf_model
 
 
@@ -30,16 +29,8 @@ class TrimSimulator(Simulator):
         gamma = 0. * np.pi / 180.
         turn_radius = np.inf
         trim_state, trim_input = compute_trim(self.mav, Va, gamma, turn_radius)
-        # trim_state, trim_input = compute_gradient_descent_trim(self.mav.mav_p,
-        #                                                        self.mav.dynamics,
-        #                                                        Va,
-        #                                                        gamma,
-        #                                                        turn_radius,
-        #                                                        max_iters=5000,
-        #                                                        epsilon=1e-8,
-        #                                                        kappa=1e-6)
         self.mav._state = trim_state  # set the initial state of the mav to the trim state
-        self.mav.integrator.set_initial_value(self.mav._state, sim_p.start_time)
+        self.mav.integrator.set_initial_value(self.mav._state, self.sim_p.start_time)
         self.mav._update_true_state()
         delta = np.copy(trim_input)  # set input to constant constant trim input
         print('trim_input:', trim_input)
@@ -53,11 +44,11 @@ class TrimSimulator(Simulator):
             = compute_tf_model(self.mav, trim_state, trim_input)
 
         # initialize the simulation time
-        sim_time = sim_p.start_time
+        sim_time = self.sim_p.start_time
 
         # main simulation loop
         print("Press Command-Q to exit...")
-        while sim_time < sim_p.end_time:
+        while sim_time < self.sim_p.end_time:
 
             self.mav.update(delta)
 
@@ -67,9 +58,14 @@ class TrimSimulator(Simulator):
                 self.data_view.update(self.mav.true_state,  # true states
                                       self.mav.true_state,  # estimated states
                                       self.mav.true_state,  # commanded states
-                                      sim_p.dt_simulation)
+                                      self.sim_p.dt_simulation)
 
             # -------increment time-------------
-            sim_time += sim_p.dt_simulation
+            sim_time += self.sim_p.dt_simulation
 
         sys.exit(self.mav_view.app.exec_())
+
+
+if __name__ == "__main__":
+    simulator = TrimSimulator()
+    simulator.simulate()

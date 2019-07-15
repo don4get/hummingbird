@@ -15,7 +15,7 @@ class WaypointViewer:
         self.app = pg.QtGui.QApplication([])  # initialize QT
         self.window = gl.GLViewWidget()  # initialize the view object
         self.window.setWindowTitle('Waypoint Viewer')
-        self.window.setGeometry(0, 0, 1000, 1000)  # args: upper_left_x, upper_right_y, width, height
+        self.window.setGeometry(0, 0, 800, 600)  # args: upper_left_x, upper_right_y, width, height
         grid = gl.GLGridItem()  # make a grid to represent the ground
         grid.scale(self.scale / 20, self.scale / 20,
                    self.scale / 20)  # set the size of the grid (distance between each line)

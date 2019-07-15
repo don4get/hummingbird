@@ -1,43 +1,45 @@
-from hummingbird.parameters import simulation_parameters as SP
+from hummingbird.parameters.simulation_parameters import SimulationParameters
 
-ts_control = SP.dt_controller
 
-gravity = 9.8
-sigma = 0.05
-Va0 = 25
+class ControlParameters:
+    ts_control = SimulationParameters().dt_controller
 
-# data = []
-# with open("trim.pkl", 'rb') as f:
-# data = pkl.load(f)
+    gravity = 9.8
+    sigma = 0.05
+    Va0 = 25
 
-# deltas_trim = data[1]
+    # data = []
+    # with open("trim.pkl", 'rb') as f:
+    # data = pkl.load(f)
 
-# ----------roll loop-------------
-roll_kp = 0.4743
-roll_kd = 0.1584
+    # deltas_trim = data[1]
 
-# ----------course loop-------------
-course_kp = 1.25
-course_ki = 0.2
+    # ----------roll loop-------------
+    roll_kp = 0.4743
+    roll_kd = 0.1584
 
-# ----------sideslip loop-------------
-sideslip_ki = 0
-sideslip_kp = 0.1
+    # ----------course loop-------------
+    course_kp = 1.25
+    course_ki = 0.2
 
-# ----------yaw damper-------------
-yaw_damper_tau_r = 0.05
-yaw_damper_kp = 0.5
+    # ----------sideslip loop-------------
+    sideslip_ki = 0
+    sideslip_kp = 0.1
 
-# ----------pitch loop-------------
-pitch_kp = -4.5
-pitch_kd = -0.7
-K_theta_DC = 1.0
+    # ----------yaw damper-------------
+    yaw_damper_tau_r = 0.05
+    yaw_damper_kp = 0.5
 
-# ----------altitude loop-------------
-altitude_kp = 0.05
-altitude_ki = 0.011
-altitude_zone = 2.0
+    # ----------pitch loop-------------
+    pitch_kp = -4.5
+    pitch_kd = -0.7
+    K_theta_DC = 1.0
 
-# ---------airspeed hold using throttle---------------
-airspeed_throttle_kp = 1.25
-airspeed_throttle_ki = 0.35
+    # ----------altitude loop-------------
+    altitude_kp = 0.05
+    altitude_ki = 0.011
+    altitude_zone = 2.0
+
+    # ---------airspeed hold using throttle---------------
+    airspeed_throttle_kp = 1.25
+    airspeed_throttle_ki = 0.35

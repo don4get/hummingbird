@@ -2,16 +2,12 @@ from functools import partial
 
 from hummingbird.parameters.constants import ActuatorEnum, PhysicalConstants as pc, StateEnum
 from hummingbird.physics.dynamics_base import *
-from hummingbird.maths.generics import compute_sigmoid
-from hummingbird.physics.kinematics import compute_kinematics, compute_kinematics_from_quat
-from hummingbird.physics.generics import *
-from hummingbird.maths.gradient_descent import gradient_descent
-
+from hummingbird.physics.kinematics import compute_kinematics_from_quat
 
 import numpy as np
 from hummingbird.message_types.msg_state import MsgState
 from hummingbird.parameters.aerosonde_parameters import MavParameters
-from hummingbird.parameters import simulation_parameters as sim_p
+from hummingbird.parameters.simulation_parameters import SimulationParameters
 from hummingbird.physics.generics import propeller_thrust_torque
 from hummingbird.tools.rotations import Quaternion2Rotation, Quaternion2Euler
 from math import asin, exp, acos
@@ -31,6 +27,7 @@ class FixedWingDynamics(DynamicsBase):
         :param dt_integration: Sampling time of the integrator
         :type dt_integration: double [s]
     """
+    sim_p = SimulationParameters()
 
     def __init__(self,
                  x0=MavParameters().initial_state,

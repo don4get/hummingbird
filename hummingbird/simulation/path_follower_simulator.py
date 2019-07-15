@@ -3,7 +3,6 @@ import numpy as np
 from hummingbird.simulation.simulator import Simulator
 from hummingbird.graphics.video_writer import VideoWriter
 
-from hummingbird.parameters import simulation_parameters as sim_p
 from hummingbird.graphics.path_viewer import PathViewer
 from hummingbird.graphics.data_viewer import DataViewer
 from hummingbird.physics.wind_simulation import WindSimulation
@@ -29,8 +28,8 @@ class PathFollowerSimulator(Simulator):
         self.data_view = DataViewer(800, 0)
         self.mav = FixedWing()
         self.wind = WindSimulation()
-        self.ctrl = Autopilot(sim_p.dt_controller)
-        self.obsv = Observer(sim_p.dt_controller)
+        self.ctrl = Autopilot(self.sim_p.dt_controller)
+        self.obsv = Observer(self.sim_p.dt_controller)
         self.measurements = self.mav.sensors.sensors
 
         self.path_follow = PathFollower()
@@ -47,7 +46,7 @@ class PathFollowerSimulator(Simulator):
             self.path.orbit_direction = 'CW'  # orbit direction: 'CW'==clockwise, 'CCW'==counter clockwise
 
     def simulate(self):
-        while self.sim_time < sim_p.end_time:
+        while self.sim_time < self.sim_p.end_time:
 
             # -------observer-------------
             self.measurements = self.mav.sensors.update_sensors(self.mav.dynamics.true_state,
@@ -71,10 +70,14 @@ class PathFollowerSimulator(Simulator):
                 self.data_view.update(self.mav.dynamics.true_state,  # true states
                                       estimated_state,  # estimated states
                                       commanded_state,  # commanded states
-                                      sim_p.dt_simulation)
+                                      self.sim_p.dt_simulation)
 
             # -------increment time-------------
-            self.sim_time += sim_p.dt_simulation
+            self.sim_time += self.sim_p.dt_simulation
 
         sys.exit(self.path_view.app.exec_())
 
+
+if __name__ == "__main__":
+    simulator = PathFollowerSimulator()
+    simulator.simulate()

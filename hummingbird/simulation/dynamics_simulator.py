@@ -62,3 +62,8 @@ class DynamicsSimulator(Simulator):
             self.video.close()
 
         sys.exit(self.mav_view.app.exec_())
+
+
+if __name__ == "__main__":
+    simulator = DynamicsSimulator()
+    simulator.simulate()

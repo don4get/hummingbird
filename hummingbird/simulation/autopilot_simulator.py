@@ -2,7 +2,6 @@ import sys
 import numpy as np
 from hummingbird.simulation.simulator import Simulator
 from hummingbird.graphics.video_writer import VideoWriter
-from hummingbird.parameters import simulation_parameters as sim_p
 from hummingbird.graphics.mav_viewer import MavViewer
 from hummingbird.graphics.data_viewer import DataViewer
 from hummingbird.physics.fixed_wing_dynamics import FixedWingDynamics
@@ -27,7 +26,7 @@ class AutopilotSimulator(Simulator):
         self.data_view = DataViewer(800, 0)
         self.mav = FixedWingDynamics()
         self.wind = WindSimulation()
-        self.ctrl = Autopilot(sim_p.dt_controller)
+        self.ctrl = Autopilot(self.sim_p.dt_controller)
 
         # autopilot commands
         self.commands = MsgAutopilot()
@@ -45,7 +44,7 @@ class AutopilotSimulator(Simulator):
                                    frequency=0.2)
 
     def simulate(self):
-        while self.sim_time < sim_p.end_time:
+        while self.sim_time < self.sim_p.end_time:
 
             # -------controller-------------
             estimated_state = self.mav.true_state  # uses true states in the control
@@ -64,9 +63,14 @@ class AutopilotSimulator(Simulator):
                 self.data_view.update(self.mav.true_state,  # true states
                                       self.mav.true_state,  # estimated states
                                       commanded_state,  # commanded states
-                                      sim_p.dt_simulation)
+                                      self.sim_p.dt_simulation)
 
             # -------increment time-------------
-            self.sim_time += sim_p.dt_simulation
+            self.sim_time += self.sim_p.dt_simulation
 
         sys.exit(self.mav_view.app.exec_())
+
+
+if __name__ == "__main__":
+    simulator = AutopilotSimulator()
+    simulator.simulate()

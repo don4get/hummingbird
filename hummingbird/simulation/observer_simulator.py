@@ -3,7 +3,6 @@ import numpy as np
 from hummingbird.simulation.simulator import Simulator
 from hummingbird.graphics.video_writer import VideoWriter
 
-from hummingbird.parameters import simulation_parameters as sim_p
 from hummingbird.graphics.mav_viewer import MavViewer
 from hummingbird.graphics.data_viewer import DataViewer
 from hummingbird.physics.wind_simulation import WindSimulation
@@ -29,8 +28,8 @@ class ObserverSimulator(Simulator):
         self.data_view = DataViewer(800, 0)
         self.mav = FixedWing()
         self.wind = WindSimulation()
-        self.ctrl = Autopilot(sim_p.dt_controller)
-        self.obsv = Observer(sim_p.dt_controller)
+        self.ctrl = Autopilot(self.sim_p.dt_controller)
+        self.obsv = Observer(self.sim_p.dt_controller)
         self.measurements = self.mav.sensors.sensors
 
         # autopilot commands
@@ -49,7 +48,7 @@ class ObserverSimulator(Simulator):
                                    frequency=0.02)
 
     def simulate(self):
-        while self.sim_time < sim_p.end_time:
+        while self.sim_time < self.sim_p.end_time:
 
             # -------autopilot commands-------------
             self.commands.airspeed_command = self.Va_command.square(self.sim_time)
@@ -72,10 +71,14 @@ class ObserverSimulator(Simulator):
                 self.data_view.update(self.mav.dynamics.true_state,  # true states
                                       estimated_state,  # estimated states
                                       commanded_state,  # commanded states
-                                      sim_p.dt_simulation)
+                                      self.sim_p.dt_simulation)
 
             # -------increment time-------------
-            self.sim_time += sim_p.dt_simulation
+            self.sim_time += self.sim_p.dt_simulation
 
         sys.exit(self.mav_view.app.exec_())
 
+
+if __name__ == "__main__":
+    simulator = ObserverSimulator()
+    simulator.simulate()

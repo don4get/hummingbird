@@ -2,11 +2,13 @@ import numpy as np
 from hummingbird.message_types.msg_sensors import MsgSensors
 from hummingbird.parameters.sensor_parameters import SensorParameters
 from hummingbird.parameters.aerosonde_parameters import MavParameters
-from hummingbird.parameters import simulation_parameters as sim_p
+from hummingbird.parameters.simulation_parameters import SimulationParameters
 from hummingbird.message_types.msg_state import MsgState
 
 
 class Sensors:
+    sim_p = SimulationParameters()
+
     def __init__(self,
                  mav_p=MavParameters,
                  sensor_p=SensorParameters,

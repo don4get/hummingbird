@@ -8,10 +8,12 @@ part of mavsim_python
         3/26/2019 - RWB
 """
 import numpy as np
-from hummingbird.parameters import planner_parameters as PLAN
+from hummingbird.parameters.planner_parameters import PlannerParameters
 
 
 class MsgWaypoints:
+    plan_p = PlannerParameters()
+
     def __init__(self):
         # the first two flags are used for interacting with the path planner
         #
@@ -51,4 +53,4 @@ class MsgWaypoints:
         self.course = wp_courses
         self.flag_waypoints_changed = True
         self.num_waypoints = self.ned.shape[0]
-        self.airspeed = np.array([PLAN.Va0] * self.num_waypoints)
+        self.airspeed = np.array([self.plan_p.Va0] * self.num_waypoints)

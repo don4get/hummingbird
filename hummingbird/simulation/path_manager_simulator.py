@@ -3,7 +3,7 @@ import numpy as np
 from hummingbird.simulation.simulator import Simulator
 from hummingbird.graphics.video_writer import VideoWriter
 
-from hummingbird.parameters import simulation_parameters as sim_p, planner_parameters as plan_p
+from hummingbird.parameters.planner_parameters import PlannerParameters
 from hummingbird.graphics.waypoint_viewer import WaypointViewer
 from hummingbird.graphics.data_viewer import DataViewer
 from hummingbird.physics.wind_simulation import WindSimulation
@@ -34,17 +34,18 @@ class PathManagerSimulator(Simulator):
         self.data_view = DataViewer(800, 0)
         self.mav = FixedWing()
         self.wind = WindSimulation()
-        self.ctrl = Autopilot(sim_p.dt_controller)
-        self.obsv = Observer(sim_p.dt_controller)
+        self.ctrl = Autopilot(self.sim_p.dt_controller)
+        self.obsv = Observer(self.sim_p.dt_controller)
         self.measurements = self.mav.sensors.sensors
 
         self.path_follow = PathFollower()
         self.path_manage = PathManager()
+        self.plan_p = PlannerParameters()
 
         self.waypoints = MsgWaypoints()
         self.waypoints.type = config
         self.waypoints.num_waypoints = 4
-        Va = plan_p.Va0
+        Va = self.plan_p.Va0
         self.waypoints.ned[:self.waypoints.num_waypoints] = np.array([[0, 0, -100],
                                                             [1000, 0, -100],
                                                             [0, 1000, -100],
@@ -56,7 +57,7 @@ class PathManagerSimulator(Simulator):
                                                                np.radians(-135)])
 
     def simulate(self):
-        while self.sim_time < sim_p.end_time:
+        while self.sim_time < self.sim_p.end_time:
 
             # -------observer-------------
             measurements = self.mav.sensors.update_sensors(self.mav.dynamics.true_state,
@@ -64,7 +65,7 @@ class PathManagerSimulator(Simulator):
             estimated_state = self.obsv.update(measurements)  # estimate states from measurements
 
             # -------path manager-------------
-            path = self.path_manage.update(self.waypoints, plan_p.R_min, estimated_state)
+            path = self.path_manage.update(self.waypoints, self.plan_p.R_min, estimated_state)
 
             # -------path follower-------------
             # autopilot_commands = path_follow.update(path, estimated_state)
@@ -89,10 +90,14 @@ class PathManagerSimulator(Simulator):
                 self.data_view.update(self.mav.dynamics.true_state,  # true states
                                       estimated_state,  # estimated states
                                       commanded_state,  # commanded states
-                                      sim_p.dt_simulation)
+                                      self.sim_p.dt_simulation)
 
             # -------increment time-------------
-            self.sim_time += sim_p.dt_simulation
+            self.sim_time += self.sim_p.dt_simulation
 
         sys.exit(self.waypoint_view.app.exec_())
 
+
+if __name__ == "__main__":
+    simulator = PathManagerSimulator()
+    simulator.simulate()

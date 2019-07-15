@@ -1,4 +1,4 @@
-from hummingbird.simulation.simulator import Simulator, simulate
+from hummingbird.simulation.simulator import Simulator
 from hummingbird.graphics.mav_viewer import MavViewer
 from hummingbird.graphics.video_writer import VideoWriter
 from hummingbird.physics.fixed_wing_dynamics import FixedWingDynamics
@@ -56,3 +56,8 @@ class PhysicsSimulator(Simulator):
         if self.record_video:
             self.video.close()
         sys.exit(self.mav_view.app.exec_())
+
+
+if __name__ == "__main__":
+    simulator = PhysicsSimulator()
+    simulator.simulate()

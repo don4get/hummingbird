@@ -1,11 +1,13 @@
 import numpy as np
-from hummingbird.parameters import simulation_parameters as sim_p
+from hummingbird.parameters.simulation_parameters import SimulationParameters
 from hummingbird.parameters.sensor_parameters import SensorParameters
 from hummingbird.parameters.constants import PhysicalConstants as pc
 from hummingbird.tools.rotations import jacobian
 
 
 class EkfAttitude:
+    sim_p = SimulationParameters()
+
     # implement continuous-discrete EKF to estimate roll and pitch angles
     def __init__(self):
         self.Q = np.diag([1e-6, 1e-6])
@@ -14,7 +16,7 @@ class EkfAttitude:
         self.N = 10  # number of prediction step per sample
         self.xhat = np.zeros(2)  # initial state: phi, theta
         self.P = np.eye(2) * 0.1
-        self.Ts = sim_p.dt_controller / self.N
+        self.Ts = self.sim_p.dt_controller / self.N
 
     def update(self, state, measurement):
         self.propagate_model(state)

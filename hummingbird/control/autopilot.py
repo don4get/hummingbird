@@ -1,14 +1,5 @@
-"""
-autopilot block for mavsim_python
-    - Beard & McLain, PUP, 2012
-    - Last Update:
-        2/6/2019 - RWB
-"""
-import sys
 import numpy as np
-
-sys.path.append('..')
-from hummingbird.parameters import control_parameters as AP
+from hummingbird.parameters.control_parameters import ControlParameters
 from hummingbird.control.pid_control import PiControl, PdControlWithRate
 from hummingbird.message_types.msg_state import MsgState
 from hummingbird.tools.transfer_function import TransferFunction
@@ -16,39 +7,40 @@ from hummingbird.tools.transfer_function import TransferFunction
 
 class Autopilot:
     def __init__(self, ts_control):
+        self.auto_p = ControlParameters()
         # instantiate lateral controllers
         self.roll_to_aileron = PdControlWithRate(
-            kp=AP.roll_kp,
-            kd=AP.roll_kd,
+            kp=self.auto_p.roll_kp,
+            kd=self.auto_p.roll_kd,
             limit=np.radians(45))
         self.course_to_roll = PiControl(
-            kp=AP.course_kp,
-            ki=AP.course_ki,
+            kp=self.auto_p.course_kp,
+            ki=self.auto_p.course_ki,
             Ts=ts_control,
             limit=np.radians(30))
         self.sideslip_to_rudder = PiControl(
-            kp=AP.sideslip_kp,
-            ki=AP.sideslip_ki,
+            kp=self.auto_p.sideslip_kp,
+            ki=self.auto_p.sideslip_ki,
             Ts=ts_control,
             limit=np.radians(45))
         self.yaw_damper = TransferFunction(
-            num=np.array([AP.yaw_damper_kp, 0]),
-            den=np.array([1, 1 / AP.yaw_damper_tau_r]),
+            num=np.array([self.auto_p.yaw_damper_kp, 0]),
+            den=np.array([1, 1 / self.auto_p.yaw_damper_tau_r]),
             Ts=ts_control)
 
         # instantiate longitudinal controllers
         self.pitch_to_elevator = PdControlWithRate(
-            kp=AP.pitch_kp,
-            kd=AP.pitch_kd,
+            kp=self.auto_p.pitch_kp,
+            kd=self.auto_p.pitch_kd,
             limit=np.radians(45))
         self.altitude_to_pitch = PiControl(
-            kp=AP.altitude_kp,
-            ki=AP.altitude_ki,
+            kp=self.auto_p.altitude_kp,
+            ki=self.auto_p.altitude_ki,
             Ts=ts_control,
             limit=np.radians(30))
         self.airspeed_to_throttle = PiControl(
-            kp=AP.airspeed_throttle_kp,
-            ki=AP.airspeed_throttle_ki,
+            kp=self.auto_p.airspeed_throttle_kp,
+            ki=self.auto_p.airspeed_throttle_ki,
             Ts=ts_control,
             limit=1.0,
             lower_lim=0)

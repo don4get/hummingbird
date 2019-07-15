@@ -1,9 +1,11 @@
 import numpy as np
 from hummingbird.parameters.aerosonde_parameters import MavParameters
-from hummingbird.parameters import simulation_parameters as sim_p
+from hummingbird.parameters.simulation_parameters import SimulationParameters
 
 
 class WindSimulation:
+    sim_p = SimulationParameters()
+
     def __init__(self, mav_p=MavParameters(), dt=sim_p.dt_simulation):
         self.mav_p = mav_p
         # steady state wind defined in the inertial frame

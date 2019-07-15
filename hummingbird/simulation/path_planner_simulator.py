@@ -2,7 +2,7 @@ import sys
 from hummingbird.simulation.simulator import Simulator
 from hummingbird.graphics.video_writer import VideoWriter
 
-from hummingbird.parameters import simulation_parameters as sim_p, planner_parameters as plan
+from hummingbird.parameters.planner_parameters import PlannerParameters
 from hummingbird.graphics.data_viewer import DataViewer
 from hummingbird.physics.wind_simulation import WindSimulation
 from hummingbird.physics.fixed_wing import FixedWing
@@ -30,19 +30,20 @@ class PathPlannerSimulator(Simulator):
         self.data_view = DataViewer(800, 0)
         self.mav = FixedWing()
         self.wind = WindSimulation()
-        self.ctrl = Autopilot(sim_p.dt_controller)
-        self.obsv = Observer(sim_p.dt_controller)
+        self.ctrl = Autopilot(self.sim_p.dt_controller)
+        self.obsv = Observer(self.sim_p.dt_controller)
         self.measurements = self.mav.sensors.sensors
 
         self.path_follow = PathFollower()
         self.path_manage = PathManager()
+        self.plan_p = PlannerParameters()
 
         self.path_plan = PathPlanner()
 
-        self.msg_map = MsgMap(plan)
+        self.msg_map = MsgMap(self.plan_p)
 
     def simulate(self):
-        while self.sim_time < sim_p.end_time:
+        while self.sim_time < self.sim_p.end_time:
 
             # -------observer-------------
             measurements = self.mav.sensors.update_sensors(self.mav.dynamics.true_state,
@@ -54,7 +55,7 @@ class PathPlannerSimulator(Simulator):
                 waypoints = self.path_plan.update(self.msg_map, estimated_state)
 
             # -------path manager-------------
-            path = self.path_manage.update(waypoints, plan.R_min, estimated_state)
+            path = self.path_manage.update(waypoints, self.plan_p.R_min, estimated_state)
 
             # -------path follower-------------
             autopilot_commands = self.path_follow.update(path, estimated_state)
@@ -72,9 +73,13 @@ class PathPlannerSimulator(Simulator):
                 self.data_view.update(self.mav.dynamics.true_state,  # true states
                                       estimated_state,  # estimated states
                                       commanded_state,  # commanded states
-                                      sim_p.dt_simulation)
+                                      self.sim_p.dt_simulation)
 
-            self.sim_time += sim_p.dt_simulation
+            self.sim_time += self.sim_p.dt_simulation
 
         sys.exit(self.world_view.app.exec_())
 
+
+if __name__ == "__main__":
+    simulator = PathPlannerSimulator()
+    simulator.simulate()

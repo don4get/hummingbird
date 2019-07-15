@@ -1,9 +1,11 @@
 import numpy as np
 from hummingbird.message_types.msg_waypoints import MsgWaypoints
-from hummingbird.parameters import planner_parameters as planner_p
+from hummingbird.parameters.planner_parameters import PlannerParameters
 
 
 class PlanRrt:
+    plan_p = PlannerParameters()
+
     def __init__(self):
         self.segmentLength = 400  # standard length of path segments
         self.margin = 20  # desired clearance between mav and obstacles
@@ -169,13 +171,13 @@ class PlanRrt:
         while j < path.size - 1:
             point_added = False
             if self.collision(path[i], path[j + 1], map):
-                if self.distance(path[i], path[j]) > planner_p.R_min:
+                if self.distance(path[i], path[j]) > self.plan_p.R_min:
                     path_smooth = np.append(path_smooth, path[j])
                     i = j
                     point_added = True
                 else:
                     for k in range(1, j - i - 2):  # from 3rd-to-last node to 3rd node
-                        if self.distance(path[i], path[j - k]) > planner_p.R_min:
+                        if self.distance(path[i], path[j - k]) > self.plan_p.R_min:
                             path_smooth = np.append(path[i], path[j - k])
                             i = j
                             point_added = True
