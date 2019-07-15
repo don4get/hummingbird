@@ -1,9 +1,3 @@
-"""
-mavsim_python: world viewer (for chapter 12)
-    - Beard & McLain, PUP, 2012
-    - Update history:
-        4/3/2019 - BGM
-"""
 import numpy as np
 import pyqtgraph as pg
 import pyqtgraph.opengl as gl
@@ -17,7 +11,7 @@ from hummingbird.tools.wrap import mod
 
 class WorldViewer:
     def __init__(self):
-        self.scale = 4000
+        self.scale = 2000
         # initialize Qt gui application and window
         self.app = pg.QtGui.QApplication([])  # initialize QT
         self.window = gl.GLViewWidget()  # initialize the view object
@@ -27,7 +21,8 @@ class WorldViewer:
         grid.scale(self.scale / 20, self.scale / 20,
                    self.scale / 20)  # set the size of the grid (distance between each line)
         self.window.addItem(grid)  # add grid to viewer
-        self.window.setCameraPosition(distance=self.scale, elevation=50, azimuth=-90)
+        self.window.setCameraPosition(distance=self.scale, elevation=45, azimuth=-120)
+        self.window.opts["center"] = pg.Vector(500., 500., 0.)
         self.window.setBackgroundColor('k')  # set background color to black
         self.window.show()  # display configured window
         self.window.raise_()  # bring window to the front

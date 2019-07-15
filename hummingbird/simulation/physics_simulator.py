@@ -14,7 +14,7 @@ class PhysicsSimulator(Simulator):
 
         if self.record_video:
             self.video = VideoWriter(video_name="physics.avi",
-                                     bounding_box=(0, 0, 1000, 1000),
+                                     bounding_box=(0, 0, 800, 600),
                                      output_rate=self.sim_p.dt_video)
         self.display_data = display_data
 
@@ -32,7 +32,7 @@ class PhysicsSimulator(Simulator):
             delta_e = -0.5
             delta_a = 0.
             delta_r = 0.
-            delta_t = 1.0
+            delta_t = 0.6
 
             delta = np.array([delta_e, delta_a, delta_r, delta_t])
 

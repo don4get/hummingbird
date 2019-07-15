@@ -20,12 +20,12 @@ class PathManagerSimulator(Simulator):
     config: 'straight_line' 'fillet' 'dubins'
 
     """
-    def __init__(self, record_video=False, display_data=True, config="fillet"):
+    def __init__(self, record_video=False, display_data=True, config="dubins"):
         Simulator.__init__(self, record_video)
 
         if self.record_video:
-            self.video = VideoWriter(video_name="sensors.avi",
-                                     bounding_box=(0, 0, 1000, 1000),
+            self.video = VideoWriter(video_name="path_manager.avi",
+                                     bounding_box=(0, 0, 800, 600),
                                      output_rate=self.sim_p.dt_video)
         self.display_data = display_data
 
@@ -76,7 +76,7 @@ class PathManagerSimulator(Simulator):
 
             # -------physical system-------------
             current_wind = self.wind.update()  # get the new wind vector
-            self.mav.dynamics.update(delta, current_wind)  # propagate the MAV dynamics
+            self.mav.dynamics.update(delta)  # propagate the MAV dynamics
 
             # -------update viewer-------------
             if not self.waypoint_view.plot_initialized:
@@ -94,6 +94,12 @@ class PathManagerSimulator(Simulator):
 
             # -------increment time-------------
             self.sim_time += self.sim_p.dt_simulation
+
+            if self.record_video:
+                self.video.update(self.sim_time)
+
+        if self.record_video:
+            self.video.close()
 
         sys.exit(self.waypoint_view.app.exec_())
 

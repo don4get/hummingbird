@@ -13,7 +13,7 @@ class DynamicsSimulator(Simulator):
         Simulator.__init__(self, record_video)
         if self.record_video:
             self.video = VideoWriter(video_name="dynamics.avi",
-                                     bounding_box=(0, 0, 1000, 1000),
+                                     bounding_box=(0, 0, 800, 600),
                                      output_rate=self.sim_p.dt_video)
 
         self.sim_p.end_time = 50.

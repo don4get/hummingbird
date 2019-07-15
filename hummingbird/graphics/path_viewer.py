@@ -4,14 +4,15 @@ import pyqtgraph.opengl as gl
 from hummingbird.tools.rotations import Euler2Rotation
 from hummingbird.tools.points_transformations import rotate_points, translate_points, get_mav_points, points_to_mesh
 
+
 class PathViewer:
     def __init__(self):
-        self.scale = 4000
+        self.scale = 2500
         # initialize Qt gui application and window
         self.app = pg.QtGui.QApplication([])  # initialize QT
         self.window = gl.GLViewWidget()  # initialize the view object
         self.window.setWindowTitle('Path Viewer')
-        self.window.setGeometry(0, 0, 1000, 1000)  # args: upper_left_x, upper_right_y, width, height
+        self.window.setGeometry(0, 0, 800, 600)  # args: upper_left_x, upper_right_y, width, height
         grid = gl.GLGridItem()  # make a grid to represent the ground
         grid.scale(self.scale / 20, self.scale / 20,
                    self.scale / 20)  # set the size of the grid (distance between each line)

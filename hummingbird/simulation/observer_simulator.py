@@ -18,14 +18,14 @@ class ObserverSimulator(Simulator):
         Simulator.__init__(self, record_video)
 
         if self.record_video:
-            self.video = VideoWriter(video_name="sensors.avi",
-                                     bounding_box=(0, 0, 1000, 1000),
+            self.video = VideoWriter(video_name="observer.avi",
+                                     bounding_box=(0, 0, 800, 600),
                                      output_rate=self.sim_p.dt_video)
         self.display_data = display_data
 
         self.sim_p.end_time = 50.
         self.mav_view = MavViewer()
-        self.data_view = DataViewer(800, 0)
+        self.data_view = DataViewer(0, 0)
         self.mav = FixedWing()
         self.wind = WindSimulation()
         self.ctrl = Autopilot(self.sim_p.dt_controller)
@@ -73,8 +73,15 @@ class ObserverSimulator(Simulator):
                                       commanded_state,  # commanded states
                                       self.sim_p.dt_simulation)
 
+            if self.record_video:
+                self.video.update(self.sim_time)
+
             # -------increment time-------------
             self.sim_time += self.sim_p.dt_simulation
+
+        if self.record_video:
+            self.video.close()
+            print("video closed")
 
         sys.exit(self.mav_view.app.exec_())
 

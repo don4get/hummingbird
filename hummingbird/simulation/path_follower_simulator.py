@@ -14,12 +14,12 @@ from hummingbird.message_types.msg_path import MsgPath
 
 
 class PathFollowerSimulator(Simulator):
-    def __init__(self, record_video=False, display_data=True, config="orbit"):
+    def __init__(self, record_video=False, display_data=True, config="line"):
         Simulator.__init__(self, record_video)
 
         if self.record_video:
-            self.video = VideoWriter(video_name="sensors.avi",
-                                     bounding_box=(0, 0, 1000, 1000),
+            self.video = VideoWriter(video_name="path_follower_"+config+".avi",
+                                     bounding_box=(0, 0, 800, 600),
                                      output_rate=self.sim_p.dt_video)
         self.display_data = display_data
 
@@ -72,8 +72,14 @@ class PathFollowerSimulator(Simulator):
                                       commanded_state,  # commanded states
                                       self.sim_p.dt_simulation)
 
+            if self.record_video:
+                self.video.update(self.sim_time)
+
             # -------increment time-------------
             self.sim_time += self.sim_p.dt_simulation
+
+        if self.record_video:
+            self.video.close()
 
         sys.exit(self.path_view.app.exec_())
 

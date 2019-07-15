@@ -19,7 +19,7 @@ class AutopilotTuningSimulator(Simulator):
 
         if self.record_video:
             self.video = VideoWriter(video_name="trim.avi",
-                                     bounding_box=(0, 0, 1000, 1000),
+                                     bounding_box=(0, 0, 800, 600),
                                      output_rate=self.sim_p.dt_video)
         self.display_data = display_data
 

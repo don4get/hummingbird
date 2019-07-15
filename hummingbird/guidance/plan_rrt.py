@@ -8,7 +8,7 @@ class PlanRrt:
 
     def __init__(self):
         self.segmentLength = 400  # standard length of path segments
-        self.margin = 20  # desired clearance between mav and obstacles
+        self.margin = 150  # desired clearance between mav and obstacles
         self.dx = 5  # resolution of checking for collisions [meters]
 
     def plan_path(self, wp_start, wp_end, map, wp_type="fillet"):

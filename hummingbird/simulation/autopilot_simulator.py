@@ -17,7 +17,7 @@ class AutopilotSimulator(Simulator):
 
         if self.record_video:
             self.video = VideoWriter(video_name="autopilot.avi",
-                                     bounding_box=(0, 0, 1000, 1000),
+                                     bounding_box=(0, 0, 800, 600),
                                      output_rate=self.sim_p.dt_video)
         self.display_data = display_data
 
@@ -65,8 +65,14 @@ class AutopilotSimulator(Simulator):
                                       commanded_state,  # commanded states
                                       self.sim_p.dt_simulation)
 
+            if self.record_video:
+                self.video.update(self.sim_time)
+
             # -------increment time-------------
             self.sim_time += self.sim_p.dt_simulation
+
+        if self.record_video:
+            self.video.close()
 
         sys.exit(self.mav_view.app.exec_())
 

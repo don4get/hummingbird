@@ -5,6 +5,7 @@ from hummingbird.message_types.msg_path import MsgPath
 from hummingbird.message_types.msg_state import MsgState
 from hummingbird.tools.wrap import wrap
 
+
 class PathFollower:
     def __init__(self):
         self.chi_inf = np.radians(80)  # approach angle for large distance from straight-line path

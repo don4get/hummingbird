@@ -20,8 +20,8 @@ class PathPlannerSimulator(Simulator):
         Simulator.__init__(self, record_video)
 
         if self.record_video:
-            self.video = VideoWriter(video_name="sensors.avi",
-                                     bounding_box=(0, 0, 1000, 1000),
+            self.video = VideoWriter(video_name="path_planner.avi",
+                                     bounding_box=(0, 0, 800, 600),
                                      output_rate=self.sim_p.dt_video)
         self.display_data = display_data
 
@@ -76,6 +76,12 @@ class PathPlannerSimulator(Simulator):
                                       self.sim_p.dt_simulation)
 
             self.sim_time += self.sim_p.dt_simulation
+
+            if self.record_video:
+                self.video.update(self.sim_time)
+
+        if self.record_video:
+            self.video.close()
 
         sys.exit(self.world_view.app.exec_())
 
