@@ -2,7 +2,7 @@ import sys
 import numpy as np
 from hummingbird.simulation.simulator import Simulator
 from hummingbird.graphics.video_writer import VideoWriter
-from hummingbird.physics.fixedwing_dynamics import FixedwingDynamics
+from hummingbird.physics.fixed_wing_dynamics import FixedWingDynamics
 from hummingbird.parameters import simulation_parameters as sim_p
 from hummingbird.graphics.mav_viewer import MavViewer
 from hummingbird.graphics.data_viewer import DataViewer
@@ -15,7 +15,7 @@ class TrimSimulator(Simulator):
         Simulator.__init__(self, record_video)
 
         if self.record_video:
-            self.video = VideoWriter(video_name="dynamics.avi",
+            self.video = VideoWriter(video_name="trim.avi",
                                      bounding_box=(0, 0, 1000, 1000),
                                      output_rate=self.sim_p.dt_video)
         self.display_data = display_data
@@ -23,11 +23,11 @@ class TrimSimulator(Simulator):
         self.sim_p.end_time = 50.
         self.mav_view = MavViewer()
         self.data_view = DataViewer(800, 0)
-        self.mav = FixedwingDynamics()
+        self.mav = FixedWingDynamics()
 
     def simulate(self):
         Va = 25.
-        gamma = -10. * np.pi / 180.
+        gamma = 0. * np.pi / 180.
         turn_radius = np.inf
         trim_state, trim_input = compute_trim(self.mav, Va, gamma, turn_radius)
         # trim_state, trim_input = compute_gradient_descent_trim(self.mav.mav_p,

@@ -1,4 +1,5 @@
 from hummingbird.parameters import simulation_parameters as sim_p
+import sys
 
 
 class Simulator:
@@ -11,5 +12,18 @@ class Simulator:
 
         self.sim_p = sim_p
 
-    def simulate(self):
-        raise NotImplementedError
+
+# TODO: Use this kind of decorator to run simulations
+def simulate(loop_func, start_time, end_time, viewer):
+
+    def run_loops():
+        sim_time = start_time
+        while sim_time < end_time:
+            loop_func()
+            sim_time += sim_p.dt_simulation
+
+        sys.exit(viewer.app.exec_())
+
+    return run_loops
+
+

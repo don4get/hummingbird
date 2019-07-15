@@ -1,7 +1,7 @@
 from hummingbird.simulation.simulator import Simulator
 from hummingbird.graphics.mav_viewer import MavViewer
 from hummingbird.graphics.video_writer import VideoWriter
-from hummingbird.physics.fixedwing_dynamics import FixedwingDynamics
+from hummingbird.physics.fixed_wing_dynamics import FixedWingDynamics
 from hummingbird.graphics.data_viewer import DataViewer
 from hummingbird.physics.wind_simulation import WindSimulation
 import numpy as np
@@ -19,7 +19,7 @@ class DynamicsSimulator(Simulator):
         self.sim_p.end_time = 50.
         self.mav_view = MavViewer()
         self.data_view = DataViewer(800, 0)
-        self.mav = FixedwingDynamics()
+        self.mav = FixedWingDynamics()
         self.config = config
         if self.config == "windy":
             self.wind = WindSimulation(self.sim_p.ts_simulation)
