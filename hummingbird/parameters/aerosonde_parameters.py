@@ -104,6 +104,7 @@ class MavParameters:
     #   Propeller thrust / torque parameters (see addendum by McLain)
     ######################################################################################
     # Prop parameters
+    C_prop = 1.0
     D_prop = 20 * 0.0254  # prop diameter in m
 
     # Motor parameters

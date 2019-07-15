@@ -7,6 +7,7 @@ part of mavPySim
     - Update history:  
         1/9/2019 - RWB
 """
+import numpy as np
 
 
 class MsgState:
@@ -31,3 +32,13 @@ class MsgState:
         self.bx = 0.  # gyro bias along roll axis in radians/sec
         self.by = 0.  # gyro bias along pitch axis in radians/sec
         self.bz = 0.  # gyro bias along yaw axis in radians/sec
+
+    def to_np_array(self):
+        variables = [i for i in self.__dict__.values()]
+        return np.array(variables)
+
+
+if __name__ == "__main__":
+    msg = MsgState()
+    print(msg.to_np_array())
+
