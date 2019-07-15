@@ -19,3 +19,27 @@ This new version will allow me to go further and test some features of OSS scien
 
 ## Do you want more info?
 Feel free to read the [wiki](https://github.com/don4get/hummingbird/wiki)
+
+## Examples 
+
+#### Kinematics
+![](examples/kinematics.gif)
+
+#### Open loop physics
+![](examples/physics.gif)
+
+#### Closed loop simulation
+![](examples/autopilot.gif)
+
+#### Data analysis
+![](examples/observer.gif)
+
+#### Path follower
+![](examples/path_follower_orbit.gif)
+![](examples/path_follower_line.gif)
+
+#### Path manager
+![](examples/path_manager.gif)
+
+#### Path planner
+![](examples/path_planner.gif)
