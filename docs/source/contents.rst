@@ -43,3 +43,47 @@ First steps
     * :code:`python mavsim_chap12.py`
 
 .. _download python: https://www.python.org/downloads/
+
+Examples
+--------
+
+**Kinematics**
+
+.. image:: ../../examples/kinematics.gif
+   :alt: Image not found
+
+**Open loop physics**
+
+.. image:: ../../examples/physics.gif
+   :alt: Image not found
+
+**Closed loop simulation**
+
+.. image:: ../../examples/autopilot.gif
+   :alt: Image not found
+
+**Data analysis**
+
+.. image:: ../../examples/observer.gif
+   :alt: Image not found
+
+**Path follower**
+
+.. image:: ../../examples/path_follower_line.gif
+   :alt: Image not found
+
+.. image:: ../../examples/path_follower_orbit.gif
+   :alt: Image not found
+
+**Path manager**
+
+.. image:: ../../examples/path_manager.gif
+   :alt: Image not found
+
+**Path planner**
+
+.. image:: ../../examples/path_planner.gif
+   :alt: Image not found
+
+
+
