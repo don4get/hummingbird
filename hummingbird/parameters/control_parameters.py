@@ -16,7 +16,7 @@ class ControlParameters:
 
     # ----------roll loop-------------
     roll_kp = 0.4743
-    roll_kd = 0.1584
+    roll_kd = -0.1584
 
     # ----------course loop-------------
     course_kp = 1.25
@@ -32,7 +32,7 @@ class ControlParameters:
 
     # ----------pitch loop-------------
     pitch_kp = -4.5
-    pitch_kd = -0.7
+    pitch_kd = 0.7
     K_theta_DC = 1.0
 
     # ----------altitude loop-------------

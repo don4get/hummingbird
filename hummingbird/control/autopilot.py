@@ -1,7 +1,7 @@
 import numpy as np
 from hummingbird.parameters.control_parameters import ControlParameters
 from hummingbird.parameters.aerosonde_parameters import MavParameters
-from hummingbird.control.pid_control import PiControl, PdControlWithRate
+from hummingbird.maths.pid import Pid
 from hummingbird.message_types.msg_state import MsgState
 from hummingbird.tools.transfer_function import TransferFunction
 from hummingbird.parameters.constants import StateEnum as SE, ActuatorEnum as AE, PhysicalConstants as PC
@@ -12,19 +12,19 @@ class Autopilot:
         self.auto_p = ControlParameters()
         self.mav_p = mav_p
         # instantiate lateral controllers
-        self.roll_to_aileron = PdControlWithRate(
+        self.roll_to_aileron = Pid(
             kp=self.auto_p.roll_kp,
             kd=self.auto_p.roll_kd,
             limit=np.radians(self.auto_p.delta_a_max_deg))
-        self.course_to_roll = PiControl(
+        self.course_to_roll = Pid(
             kp=self.auto_p.course_kp,
             ki=self.auto_p.course_ki,
-            Ts=ts_control,
+            dt=ts_control,
             limit=np.radians(self.auto_p.roll_max_deg))
-        self.sideslip_to_rudder = PiControl(
+        self.sideslip_to_rudder = Pid(
             kp=self.auto_p.sideslip_kp,
             ki=self.auto_p.sideslip_ki,
-            Ts=ts_control,
+            dt=ts_control,
             limit=np.radians(self.auto_p.delta_r_max_deg))
         # TODO: yaw_damper tf should inherit from tf in python-control
         self.yaw_damper = TransferFunction(
@@ -33,40 +33,39 @@ class Autopilot:
             Ts=ts_control)
 
         # instantiate longitudinal controllers
-        self.pitch_to_elevator = PdControlWithRate(
+        self.pitch_to_elevator = Pid(
             kp=self.auto_p.pitch_kp,
             kd=self.auto_p.pitch_kd,
             limit=np.radians(self.auto_p.delta_e_max_deg))
-        self.altitude_to_pitch = PiControl(
+        self.altitude_to_pitch = Pid(
             kp=self.auto_p.altitude_kp,
             ki=self.auto_p.altitude_ki,
-            Ts=ts_control,
+            dt=ts_control,
             limit=np.radians(self.auto_p.pitch_max_deg))
-        self.airspeed_to_throttle = PiControl(
+        self.airspeed_to_throttle = Pid(
             kp=self.auto_p.airspeed_throttle_kp,
             ki=self.auto_p.airspeed_throttle_ki,
-            Ts=ts_control,
+            dt=ts_control,
             limit=self.auto_p.delta_t_max,
-            lower_lim=self.auto_p.delta_t_min)
+            lower_limit=self.auto_p.delta_t_min)
         # TODO: tune airspeed to pitch pid
-        self.airspeed_to_pitch = PiControl(
+        self.airspeed_to_pitch = Pid(
             kp=1.,
             ki=0.,
-            Ts=ts_control,
+            dt=ts_control,
             limit=self.auto_p.delta_e_max_deg)
         self.commanded_state = MsgState()
 
     def update(self, cmd, state):
         # lateral autopilot
-        phi_c = self.course_to_roll.update(cmd.course_command, state.chi,
-                                           reset_flag=True)
-        delta_a = self.roll_to_aileron.update(phi_c, state.phi, state.p)
+        phi_c = self.course_to_roll(cmd.course_command, state.chi)
+        delta_a = self.roll_to_aileron(phi_c, state.phi, state.p)
         delta_r = self.yaw_damper.update(state.r)
 
         # longitudinal autopilot
-        theta_c = self.altitude_to_pitch.update(cmd.altitude_command, state.h)
-        delta_e = self.pitch_to_elevator.update(theta_c, state.theta, state.q)
-        delta_t = self.airspeed_to_throttle.update(cmd.airspeed_command, state.Va)
+        theta_c = self.altitude_to_pitch(cmd.altitude_command, state.h)
+        delta_e = self.pitch_to_elevator(theta_c, state.theta, state.q)
+        delta_t = self.airspeed_to_throttle(cmd.airspeed_command, state.Va)
 
         # construct output and commanded states
         delta = np.array([delta_e, delta_a, delta_r, delta_t])

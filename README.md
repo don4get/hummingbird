@@ -1,5 +1,9 @@
-# Hummingbird
-#![](docs/resources/hummingbird.gif)
+# Hummingbird 
+[![Build Status](https://travis-ci.org/don4get/hummingbird.svg?branch=master)](https://travis-ci.org/don4get/hummingbird)
+[![codecov](https://codecov.io/gh/don4get/hummingbird/branch/master/graph/badge.svg)](https://codecov.io/gh/don4get/hummingbird)
+
+
+![](docs/resources/hummingbird.gif)
 
 ### Incentive
 

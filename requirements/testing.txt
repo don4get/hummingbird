@@ -1,4 +1,0 @@
--r local-docs-build.txt
-
-pytest
-pytest-cov

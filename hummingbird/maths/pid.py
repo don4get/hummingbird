@@ -1,15 +1,13 @@
-#!/usr/bin/env python3
 """
 ###########################################
 Proportional Integral Derivative controller
 ###########################################
 """
-
+from hummingbird.maths.filters.tustin_filter import Derivative
 import numpy as np
-from hummingbird.maths.filters.tustin_filter import TustinFilter
 
 
-class PID(object):
+class Pid:
     """Class describing a PID.
 
     This implementation considers:
@@ -18,54 +16,73 @@ class PID(object):
         The output should not exceed the saturation.
 
     :param kp: Proportional gain
+    :type kp: double, optional
     :param ki: Integral gain
+    :type ki: double, optional
     :param kd: Derivative gain
+    :type kd: double, optional
     :param limit: The absolute saturation of the output of the controller
-    :param Ts: The sampling time used for output computation
-    :param tau: The ´time constant´ of the low pass filter used for derivative ouput computation
-
-    TODO: Improve the antiwindup. This integrator should not require more than a certain percentage of the total saturation.
-
+    :type limit: double, optional
+    :param dt: The sampling time used for output computation
+    :type dt: double, optional
+    :param sigma: The ´time constant´ of the low pass filter used for derivative ouput computation
+    :type sigma: double, optional
+    :param limit: The threshold to bound the maximum output (and also the minimum output in case lower_lim is None
+    :type limit: double, optional
+    :param lower_limit: The threshold to bound the minimum output
+    :type lower_limit: double, optional
     """
-
-    def __init__(self, kp, ki=0., kd=0., limit=np.inf, dt=0.01, tau=0.):
+    def __init__(self, kp=0.0, ki=0.0, kd=0.0, dt=0.01, sigma=0.05, limit=1.0, lower_limit=None):
         self.kp = kp
         self.ki = ki
         self.kd = kd
-        self.limit = limit
         self.dt = dt
-        self.filtered_error_derivative = 0.
-        self.derivative_filter = TustinFilter(self.dt, tau, self.filtered_error_derivative)
-        self.integrated_error = 0.
-        self.last_error = 0.
+        self.upper_limit = limit
+        self.lower_limit = lower_limit if lower_limit is not None else -limit
+        self.integrator = 0.
+        self.error_delay_1 = 0.
+        self.y_dot = 0.
+        self.sigma = sigma
+        self.filter = Derivative(self.dt, self.sigma, self.y_dot)
 
-    def compute_control_input(self, reference, feedback, feedback_derivative=None):
+    def __call__(self, y_ref, y, y_dot=None):
         """ Step function of the controller
 
-        :param reference: command input, reference
-        :param feedback: feedback
-        :param feedback_derivative: optional feedback derivative.
+                :param y_ref: command input, reference
+                :param y: feedback
+                :param y_dot: optional feedback derivative.
 
-        In absence of it, the controller numerically compute the derivative of the feedback.
+                In absence of it, the controller numerically compute the derivative of the feedback.
         """
-        error = reference - feedback
-        # Used trapezoidal transform for integral output.
-        self.integrated_error += 0.5 * self.dt * (error + self.last_error)
-        if feedback_derivative is not None:
-            # Use measured feedback derivative
-            # FIXME: the derivative error in the difference between the reference derivative and
-            #  the feedback derivative
-            self.filtered_error_derivative = self.kd * feedback_derivative
+
+        error = y_ref - y
+
+        if self.ki != 0.:
+            self._integrate_error(error)
+
+        if y_dot is None:
+            if self.kd != 0.:
+                self.y_dot = self.filter(y)
         else:
-            # By default, compute 1st order low pass filter thanks to Tustin transform.
-            self.filtered_error_derivative = self.derivative_filter(error)
-        self.last_error = error
-        # Bound the ouput.
-        output_unsaturated = self.kp * error + self.ki * \
-                             self.integrated_error + self.kd * self.filtered_error_derivative
-        output = np.sign(output_unsaturated) * np.min([np.abs(output_unsaturated), self.limit])
-        # Integrator anti wind up: If the ouput exceeds the saturation, reduce the integrator
-        # so that the ouput stay in the saturation interval.
+            self.y_dot = y_dot
+
+        u_unsat = self.kp * error + self.ki * self.integrator + self.kd * self.y_dot
+        u_sat = np.clip(u_unsat, self.lower_limit, self.upper_limit)
+
+        if self.ki != 0.:
+            self._antiwindup(u_unsat, u_sat)
+
+        return u_sat
+
+    def _antiwindup(self, u_unsat, u_sat):
+        # TODO: Improve the antiwindup. This integrator should not require
+        #  more than a certain percentage of the total saturation.
         if self.ki != 0:
-            self.integrated_error += self.dt / self.ki * (output - output_unsaturated)
-        return output
+            self.integrator += self.dt / self.ki * (u_sat - u_unsat)
+
+    def _integrate_error(self, e):
+        # Use trapezoidal integration
+        self.integrator += self.dt / 2. * (e + self.error_delay_1)
+        self.error_delay_1 = e
+
+

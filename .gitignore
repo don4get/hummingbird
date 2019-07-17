@@ -4,6 +4,7 @@
 *.swp
 *.avi
 *.pkl
+*.python-version
 
 venv/
 .idea/
