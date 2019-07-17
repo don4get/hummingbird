@@ -15,7 +15,7 @@ thanks to recents publications on the subject.
 
 Many thanks to Pr. R. Beard and Pr. T. McLain, who published `Small UAV Theory and practice`_.
 
-**Learn how physics of the air described in equation**
+**Learn the main principles to control a fixedwing**
     Through out this documentation, you will learn why and 
     how a small UAV is flying.
 
